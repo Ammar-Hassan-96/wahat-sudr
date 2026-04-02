@@ -1,0 +1,29 @@
+# robots.txt — واحة سدر السياحية
+# https://wahat-sudr.netlify.app/
+# آخر تحديث: مارس 2026 (v31)
+
+# ══ السماح لجميع محركات البحث ══
+User-agent: *
+Allow: /
+
+# ══ منع الوصول للملفات الحساسة ══
+Disallow: /.netlify/
+Disallow: /.env
+Disallow: /.git/
+Disallow: /node_modules/
+
+# ══ Crawl Delay ══
+Crawl-delay: 10
+
+# ══ Google ══
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 5
+
+# ══ Bing ══
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 10
+
+# ══ Sitemap ══
+Sitemap: https://wahat-sudr.netlify.app/sitemap.xml

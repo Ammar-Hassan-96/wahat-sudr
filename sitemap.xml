@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- الصفحة الرئيسية — الرابط الوحيد الحقيقي في SPA -->
+  <url>
+    <loc>https://wahat-sudr.netlify.app/</loc>
+    <lastmod>2026-03-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://wahat-sudr.netlify.app/"/>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&amp;q=80&amp;fit=crop&amp;fm=webp&amp;auto=format</image:loc>
+      <image:title>شاطئ رأس سدر الذهبي — واحة سدر السياحية</image:title>
+      <image:caption>دليلك الشامل لاكتشاف جمال رأس سدر — فنادق، شواطئ ذهبية، عيون كبريتية علاجية، وكايت سيرف</image:caption>
+    </image:image>
+  </url>
+
+</urlset>

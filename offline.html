@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>غير متصل — واحة سدر</title>
+<meta name="theme-color" content="#071A2C">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600;800;900&display=swap');
+body{
+  font-family:'Cairo',sans-serif;
+  background:linear-gradient(160deg,#071A2C 0%,#0A4A5A 50%,#071A2C 100%);
+  color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:24px;
+}
+.container{max-width:480px}
+.wave{font-size:4rem;margin-bottom:16px;animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+h1{font-size:1.6rem;font-weight:900;color:#C9A84C;margin-bottom:12px}
+p{font-size:1rem;color:rgba(255,255,255,0.7);line-height:1.8;margin-bottom:24px}
+.btn{
+  display:inline-block;padding:12px 32px;
+  background:linear-gradient(135deg,#C9A84C,#E8C55A);
+  color:#071A2C;font-weight:800;font-size:0.95rem;
+  border-radius:12px;text-decoration:none;
+  font-family:'Cairo',sans-serif;cursor:pointer;border:none;
+  box-shadow:0 4px 20px rgba(201,168,76,0.3);
+  transition:transform 0.2s;
+}
+.btn:hover{transform:translateY(-2px)}
+.info{
+  margin-top:32px;padding:16px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(201,168,76,0.2);
+  border-radius:14px;font-size:0.85rem;
+  color:rgba(255,255,255,0.5);line-height:1.7;
+}
+.emergency{margin-top:20px;font-size:0.8rem;color:rgba(255,255,255,0.4)}
+.emergency a{color:#C9A84C;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="wave">🌊</div>
+  <h1>أنت غير متصل بالإنترنت</h1>
+  <p>
+    يبدو إن الاتصال بالإنترنت انقطع. 
+    لو في سيناء، ده طبيعي في بعض المناطق البعيدة!
+    <br>جرب تاني لما ترجع في نطاق الشبكة.
+  </p>
+  <button class="btn" onclick="location.reload()">🔄 حاول تاني</button>
+  
+  <div class="info">
+    <strong>💡 نصيحة:</strong> لما ترجع أونلاين، الصفحة هتتحمل تلقائي وكل البيانات اللي حفظتها (المفضلة والنقاط) هتكون موجودة.
+  </div>
+  
+  <div class="emergency">
+    أرقام طوارئ: <a href="tel:123">إسعاف 123</a> · <a href="tel:180">مطافي 180</a> · <a href="tel:126">شرطة السياحة 126</a>
+  </div>
+</div>
+<script>
+// Auto-reload when back online
+window.addEventListener('online', () => location.reload());
+</script>
+</body>
+</html>

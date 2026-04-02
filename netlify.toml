@@ -5,6 +5,8 @@
 [functions]
   directory = "netlify/functions"
 
+# ================= HEADERS =================
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -16,19 +18,20 @@
     Cross-Origin-Opener-Policy = "same-origin-allow-popups"
     Cross-Origin-Resource-Policy = "same-site"
     X-Permitted-Cross-Domain-Policies = "none"
+
     Content-Security-Policy-Report-Only = "default-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self' https://wa.me; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net https://translate.google.com https://translate.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://www.gstatic.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.open-meteo.com https://wttr.in https://api.anthropic.com https://www.google-analytics.com https://region1.google-analytics.com https://*.supabase.co https://translate.googleapis.com https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://player.vimeo.com; media-src 'self' data: blob: https:"
+
+# ================= CACHING =================
 
 [[headers]]
   for = "/sitemap.xml"
   [headers.values]
-    Cache-Control = "public, max-age=86400, stale-while-revalidate=3600"
-    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=86400"
 
 [[headers]]
   for = "/robots.txt"
   [headers.values]
     Cache-Control = "public, max-age=86400"
-    Content-Type = "text/plain; charset=utf-8"
 
 [[headers]]
   for = "*.html"
@@ -46,7 +49,7 @@
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "*.webp"
+  for = "*.png"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
@@ -56,7 +59,7 @@
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "*.png"
+  for = "*.webp"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
@@ -70,24 +73,9 @@
   [headers.values]
     Cache-Control = "no-store"
 
-[[headers]]
-  for = "/.netlify/functions/admin-auth"
-  [headers.values]
-    Cache-Control = "no-store"
-    X-Content-Type-Options = "nosniff"
-
-[[redirects]]
-  from = "/404"
-  to = "/404.html"
-  status = 404
+# ================= REDIRECTS =================
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-
-[[headers]]
-  for = "/"
-  [headers.values]
-    Cache-Control = "no-cache, must-revalidate"

@@ -2823,12 +2823,10 @@ function getPlaceActionConfig(place, cfg){
 
 function getPlaceMapHref(place){
   const custom = String(place?.mapUrl || place?.mapQuery || '').trim();
-  if(custom){
-    if(/^https?:\/\//i.test(custom)) return custom;
-    return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(custom);
-  }
-  const title = String(place?.title || '').trim();
-  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((title || 'رأس سدر') + ' رأس سدر مصر');
+  if(custom && /^https?:\/\//i.test(custom)) return custom;
+  
+  const title = String(place?.title || 'رأس سدر').trim();
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(title + ' رأس سدر مصر');
 }
 
 function getPlaceWhatsappHref(place){
@@ -3063,7 +3061,8 @@ function closeModal(e){ if(e.target===document.getElementById('modalOverlay')) c
 function closeModalDirect(){ document.getElementById('modalOverlay').classList.remove('active'); document.body.style.overflow=''; }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeModalDirect(); closeBookingDirect(); } });
 function openPlaceMap(name){
-  openPlaceMapByUrl('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name + ' رأس سدر مصر'));
+  const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name + ' رأس سدر مصر');
+  window.open(url, '_blank');
 }
 
 // ========== BOOKING ==========
@@ -3642,7 +3641,9 @@ function calcDist(el, city){
   if(elTime)  elTime.textContent  = timeStr;
   if(elFuel)  elFuel.textContent  = '~' + fuel + ' لتر';
   if(elRoute) elRoute.innerHTML   = '🛣️ الطريق المقترح: <strong>' + d.via + '</strong>';
-  if(elGmaps) elGmaps.href = 'https://www.google.com/maps/dir/' + encodeURIComponent(city + ',مصر') + '/' + encodeURIComponent('رأس سدر، جنوب سيناء');
+  if(elGmaps) {
+  elGmaps.href = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(city + ', مصر') + '&destination=' + encodeURIComponent('رأس سدر، جنوب سيناء');
+}
   if(elRes){
     elRes.style.display = 'block';
     elRes.scrollIntoView({ behavior:'smooth', block:'nearest' });

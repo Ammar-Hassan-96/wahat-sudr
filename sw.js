@@ -2,7 +2,7 @@
 //  Service Worker — FIXED VERSION (Stable + No Cache Bugs)
 // ══════════════════════════════════════════════
 
-const CACHE_VERSION = 'ws-v2026-fixed-v2';
+const CACHE_VERSION = 'ws-v2026-fixed-v10';
 const STATIC_CACHE  = `${CACHE_VERSION}-static`;
 const IMAGES_CACHE  = `${CACHE_VERSION}-images`;
 const API_CACHE     = `${CACHE_VERSION}-api`;

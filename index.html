@@ -10299,19 +10299,21 @@ if(location.hash==='#blog')setTimeout(function(){if(typeof scrollToSectionWithOf
 <div id="google_translate_element" style="display:none"></div>
 
 <script>
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'ar',
-    autoDisplay: false
-  }, 'google_translate_element');
-}
-
 function setLanguage(lang) {
-  const select = document.querySelector(".goog-te-combo");
-  if (!select) return;
+  let tries = 0;
 
-  select.value = lang;
-  select.dispatchEvent(new Event("change"));
+  const interval = setInterval(() => {
+    const select = document.querySelector(".goog-te-combo");
+
+    if (select) {
+      select.value = lang;
+      select.dispatchEvent(new Event("change"));
+      clearInterval(interval);
+    }
+
+    tries++;
+    if (tries > 10) clearInterval(interval);
+  }, 300);
 }
 </script>
 

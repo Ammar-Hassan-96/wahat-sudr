@@ -3,7 +3,7 @@
 // Wahat Sudr
 // ═══════════════════════════════════════
 
-const CACHE_VERSION = 'ws-v5'; // غير الرقم مع أي تحديث مهم
+const CACHE_VERSION = 'ws-v6'; // غير الرقم مع أي تحديث مهم
 const IMAGE_CACHE  = `${CACHE_VERSION}-images`;
 const API_CACHE    = `${CACHE_VERSION}-api`;
 

@@ -1,29 +1,16 @@
 // ═══════════════════════════════════════
-// Service Worker — Production Ready
+// Service Worker — FINAL (No Admin Cache Issues)
 // Wahat Sudr
 // ═══════════════════════════════════════
 
-const CACHE_VERSION = 'ws-v1';
-const STATIC_CACHE = `${CACHE_VERSION}-static`;
+const CACHE_VERSION = 'ws-v3'; // غير الرقم مع كل تحديث
 const IMAGE_CACHE  = `${CACHE_VERSION}-images`;
 const API_CACHE    = `${CACHE_VERSION}-api`;
 
 const OFFLINE_URL = '/offline.html';
 
-const PRECACHE_URLS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/offline.html',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
-];
-
 // ================= INSTALL =================
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE).then(cache => cache.addAll(PRECACHE_URLS))
-  );
   self.skipWaiting();
 });
 
@@ -31,11 +18,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(k => !k.includes(CACHE_VERSION))
-          .map(k => caches.delete(k))
-      )
+      Promise.all(keys.map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
@@ -50,63 +33,55 @@ function isImageRequest(url) {
 }
 
 function isAPIRequest(url) {
-  return url.includes('api.open-meteo.com') || url.includes('wttr.in');
+  return (
+    url.includes('api.open-meteo.com') ||
+    url.includes('wttr.in') ||
+    url.includes('supabase.co') // مهم عشان بيانات الأدمن
+  );
+}
+
+function isAdminRequest(url) {
+  return url.includes('/admin') || url.includes('admin');
 }
 
 // ================= STRATEGIES =================
 
-// 🔥 Network First (HTML)
-async function networkFirst(request) {
+// 🚨 HTML — Network Only (مفيش كاش نهائي)
+async function networkOnly(request) {
   try {
-    const response = await fetch(request);
-
-    const cache = await caches.open(STATIC_CACHE);
-    cache.put(request, response.clone());
-
-    return response;
-  } catch (err) {
-    const cached = await caches.match(request);
-    if (cached) return cached;
-
-    const offline = await caches.match(OFFLINE_URL);
-    return offline || new Response('Offline', { status: 503 });
+    return await fetch(request, { cache: 'no-store' });
+  } catch {
+    return caches.match(OFFLINE_URL);
   }
 }
 
-// 🖼 Cache First (Images)
+// 🖼 Images — Cache First
 async function cacheFirst(request) {
-  const cached = await caches.match(request);
+  const cache = await caches.open(IMAGE_CACHE);
+  const cached = await cache.match(request);
+
   if (cached) return cached;
 
   try {
-    const response = await fetch(request);
-    const cache = await caches.open(IMAGE_CACHE);
-    cache.put(request, response.clone());
-    return response;
+    const res = await fetch(request);
+    cache.put(request, res.clone());
+    return res;
   } catch {
     return new Response('', { status: 404 });
   }
 }
 
-// 🔄 Stale While Revalidate (APIs)
-async function staleWhileRevalidate(request) {
+// 🔄 API — Network First (عشان الأدمن)
+async function networkFirstAPI(request) {
   const cache = await caches.open(API_CACHE);
-  const cached = await cache.match(request);
 
-  const fetchPromise = fetch(request)
-    .then(res => {
-      if (res && res.ok) cache.put(request, res.clone());
-      return res;
-    })
-    .catch(() => null);
-
-  if (cached) {
-    fetchPromise;
-    return cached;
+  try {
+    const res = await fetch(request, { cache: 'no-store' });
+    if (res && res.ok) cache.put(request, res.clone());
+    return res;
+  } catch {
+    return await cache.match(request) || new Response('{}', { status: 503 });
   }
-
-  const response = await fetchPromise;
-  return response || new Response('{}', { status: 503 });
 }
 
 // ================= FETCH =================
@@ -118,9 +93,15 @@ self.addEventListener('fetch', event => {
   // Skip Netlify internal
   if (url.includes('/.netlify/')) return;
 
-  // API
+  // 🚨 Admin requests — No Cache نهائي
+  if (isAdminRequest(url)) {
+    event.respondWith(fetch(event.request, { cache: 'no-store' }));
+    return;
+  }
+
+  // API (Supabase + Weather)
   if (isAPIRequest(url)) {
-    event.respondWith(staleWhileRevalidate(event.request));
+    event.respondWith(networkFirstAPI(event.request));
     return;
   }
 
@@ -130,14 +111,18 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // HTML pages (IMPORTANT FIX)
+  // 🚨 HTML pages (أهم حاجة)
   if (isHTMLRequest(event.request)) {
-    event.respondWith(networkFirst(event.request));
+    event.respondWith(networkOnly(event.request));
     return;
   }
 
-  // Static assets
-  event.respondWith(networkFirst(event.request));
+  // JS / CSS — Network First خفيف
+  event.respondWith(
+    fetch(event.request)
+      .then(res => res)
+      .catch(() => caches.match(event.request))
+  );
 });
 
 // ================= PUSH =================

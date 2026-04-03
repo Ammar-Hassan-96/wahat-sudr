@@ -10299,7 +10299,16 @@ if(location.hash==='#blog')setTimeout(function(){if(typeof scrollToSectionWithOf
 <div id="google_translate_element" style="display:none"></div>
 
 <script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'ar',
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
 function setLanguage(lang) {
+  let tries = 0;
+
   const interval = setInterval(() => {
     const select = document.querySelector(".goog-te-combo");
 
@@ -10308,14 +10317,14 @@ function setLanguage(lang) {
       select.dispatchEvent(new Event("change"));
       clearInterval(interval);
     }
-  }, 300);
-}
 
     tries++;
     if (tries > 10) clearInterval(interval);
   }, 300);
 }
 </script>
+
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>

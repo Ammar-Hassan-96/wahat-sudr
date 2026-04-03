@@ -1,15 +1,15 @@
 {
-  "name": "repo",
+  "name": "wahat-sudr",
   "version": "1.0.0",
-  "description": "",
-  "main": "sw.js",
+  "description": "Wahat Sudr Tourism Website",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "echo Build step (static site)",
+    "dev": "echo Run locally",
+    "deploy": "netlify deploy",
+    "deploy:prod": "netlify deploy --prod"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@netlify/blobs": "^10.7.4"
-  }
+  "keywords": ["tourism", "egypt", "ras-sudr"],
+  "author": "Ammar",
+  "license": "MIT"
 }

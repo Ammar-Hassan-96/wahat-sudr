@@ -1,9 +1,9 @@
 // ═══════════════════════════════════════
-// Service Worker — FINAL (No Admin Cache Issues + Google Translate Fix)
+// Service Worker — FINAL STABLE (Production Ready)
 // Wahat Sudr
 // ═══════════════════════════════════════
 
-const CACHE_VERSION = 'ws-v4'; // غير الرقم مع كل تحديث
+const CACHE_VERSION = 'ws-v5'; // غير الرقم مع أي تحديث مهم
 const IMAGE_CACHE  = `${CACHE_VERSION}-images`;
 const API_CACHE    = `${CACHE_VERSION}-api`;
 
@@ -18,7 +18,11 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.map(k => caches.delete(k)))
+      Promise.all(
+        keys
+          .filter(k => !k.includes(CACHE_VERSION))
+          .map(k => caches.delete(k))
+      )
     ).then(() => self.clients.claim())
   );
 });
@@ -41,10 +45,10 @@ function isAPIRequest(url) {
 }
 
 function isAdminRequest(url) {
-  return url.includes('/admin') || url.includes('admin');
+  return url.includes('/admin');
 }
 
-// 🚨 NEW: Google Translate detection
+// 🚨 مهم جداً: استثناء Google Translate
 function isGoogleTranslate(url) {
   return (
     url.includes('translate.google.com') ||
@@ -55,7 +59,7 @@ function isGoogleTranslate(url) {
 
 // ================= STRATEGIES =================
 
-// 🚨 HTML — Network Only (مفيش كاش نهائي)
+// HTML — Network Only (بدون كاش)
 async function networkOnly(request) {
   try {
     return await fetch(request, { cache: 'no-store' });
@@ -64,7 +68,7 @@ async function networkOnly(request) {
   }
 }
 
-// 🖼 Images — Cache First
+// Images — Cache First
 async function cacheFirst(request) {
   const cache = await caches.open(IMAGE_CACHE);
   const cached = await cache.match(request);
@@ -80,7 +84,7 @@ async function cacheFirst(request) {
   }
 }
 
-// 🔄 API — Network First (عشان الأدمن)
+// API — Network First
 async function networkFirstAPI(request) {
   const cache = await caches.open(API_CACHE);
 
@@ -99,22 +103,22 @@ self.addEventListener('fetch', event => {
 
   const url = event.request.url;
 
-  // Skip Netlify internal
+  // Skip Netlify internals
   if (url.includes('/.netlify/')) return;
 
-  // 🚨 IMPORTANT: Google Translate — bypass SW completely
+  // 🚨 Google Translate — بدون تدخل
   if (isGoogleTranslate(url)) {
     event.respondWith(fetch(event.request));
     return;
   }
 
-  // 🚨 Admin requests — No Cache نهائي
+  // 🚨 Admin — بدون كاش نهائي
   if (isAdminRequest(url)) {
     event.respondWith(fetch(event.request, { cache: 'no-store' }));
     return;
   }
 
-  // API (Supabase + Weather)
+  // API
   if (isAPIRequest(url)) {
     event.respondWith(networkFirstAPI(event.request));
     return;
@@ -126,13 +130,13 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // HTML pages
+  // HTML
   if (isHTMLRequest(event.request)) {
     event.respondWith(networkOnly(event.request));
     return;
   }
 
-  // JS / CSS — Network First
+  // JS / CSS — Network First بسيط
   event.respondWith(
     fetch(event.request)
       .then(res => res)

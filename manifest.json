@@ -12,46 +12,11 @@
   "scope": "/",
   "id": "/",
   "categories": ["travel", "tourism", "lifestyle"],
+
   "icons": [
-    {
-      "src": "/icons/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any"
-    },
     {
       "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-192x192-maskable.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/icons/icon-384x384.png",
-      "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
@@ -68,6 +33,7 @@
       "purpose": "maskable"
     }
   ],
+
   "screenshots": [
     {
       "src": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1280&h=720&fit=crop&fm=webp&auto=format",
@@ -84,36 +50,19 @@
       "label": "واحة سدر — عرض الموبايل"
     }
   ],
+
   "shortcuts": [
     {
       "name": "الأماكن السياحية",
       "short_name": "الأماكن",
-      "description": "استعرض أبرز الأماكن في رأس سدر",
       "url": "/#places",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     },
     {
-      "name": "العروض والباقات",
+      "name": "العروض",
       "short_name": "العروض",
-      "description": "أحدث العروض السياحية",
       "url": "/#offers",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "احجز الآن",
-      "short_name": "احجز",
-      "description": "تواصل معنا للحجز",
-      "url": "/#contact",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "المقالات",
-      "short_name": "مقالات",
-      "description": "مقالات ونصائح عن رأس سدر",
-      "url": "/#blog",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     }
-  ],
-  "related_applications": [],
-  "prefer_related_applications": false
+  ]
 }

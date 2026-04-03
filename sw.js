@@ -2,7 +2,7 @@
 // Service Worker — FINAL STABLE VERSION
 // ════════════════════════════════════════
 
-const CACHE_VERSION = 'ws-v2026-final-v13';
+const CACHE_VERSION = 'ws-v2026-final-v14';
 const STATIC_CACHE  = `${CACHE_VERSION}-static`;
 const IMAGES_CACHE  = `${CACHE_VERSION}-images`;
 const API_CACHE     = `${CACHE_VERSION}-api`;

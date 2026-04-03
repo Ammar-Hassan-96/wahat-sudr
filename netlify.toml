@@ -5,88 +5,59 @@
 [functions]
   directory = "netlify/functions"
 
+# 🔐 Security Headers
 [[headers]]
   for = "/*"
   [headers.values]
+
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=(self)"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
-    Cross-Origin-Opener-Policy = "same-origin-allow-popups"
+    Cross-Origin-Opener-Policy = "same-origin"
     Cross-Origin-Resource-Policy = "same-site"
     X-Permitted-Cross-Domain-Policies = "none"
-Content-Security-Policy-Report-Only = "default-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self' https://wa.me; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://www.gstatic.com; img-src 'self' data: blob: https: https://img.youtube.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.open-meteo.com https://wttr.in https://api.anthropic.com https://www.google-analytics.com https://region1.google-analytics.com https://cdn.jsdelivr.net https://*.supabase.co wss://*.supabase.co https://translate.googleapis.com https://translate-pa.googleapis.com https://images.unsplash.com https://img.youtube.com; frame-src 'self' https://www.youtube.com https://player.vimeo.com; media-src 'self' data: blob: https:"
-[[headers]]
-  for = "/sitemap.xml"
-  [headers.values]
-    Cache-Control = "public, max-age=86400, stale-while-revalidate=3600"
-    Content-Type = "application/xml; charset=utf-8"
 
-[[headers]]
-  for = "/robots.txt"
-  [headers.values]
-    Cache-Control = "public, max-age=86400"
-    Content-Type = "text/plain; charset=utf-8"
+    # 🔥 FIXED CSP
+    Content-Security-Policy = "
+      default-src 'self';
+      base-uri 'self';
+      frame-ancestors 'self';
 
-[[headers]]
-  for = "*.html"
-  [headers.values]
-    Cache-Control = "no-cache, must-revalidate"
+      script-src 'self' 'unsafe-inline'
+        https://www.googletagmanager.com
+        https://www.google-analytics.com
+        https://cdn.jsdelivr.net
+        https://translate.google.com
+        https://translate.googleapis.com
+        https://www.gstatic.com;
 
-[[headers]]
-  for = "*.css"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+      style-src 'self' 'unsafe-inline'
+        https://fonts.googleapis.com
+        https://cdn.jsdelivr.net;
 
-[[headers]]
-  for = "*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+      img-src 'self' data: blob: https:;
 
-[[headers]]
-  for = "*.webp"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+      font-src 'self' data:
+        https://fonts.gstatic.com;
 
-[[headers]]
-  for = "*.jpg"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+      connect-src 'self'
+        https://api.open-meteo.com
+        https://wttr.in
+        https://api.anthropic.com
+        https://www.google-analytics.com
+        https://region1.google-analytics.com
+        https://*.supabase.co
+        https://translate.googleapis.com;
 
-[[headers]]
-  for = "*.png"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+      frame-src
+        https://www.youtube.com
+        https://player.vimeo.com;
 
-[[headers]]
-  for = "/sw.js"
-  [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate"
-
-[[headers]]
-  for = "/.netlify/functions/*"
-  [headers.values]
-    Cache-Control = "no-store"
-
-[[headers]]
-  for = "/.netlify/functions/admin-auth"
-  [headers.values]
-    Cache-Control = "no-store"
-    X-Content-Type-Options = "nosniff"
-
-[[redirects]]
-  from = "/404"
-  to = "/404.html"
-  status = 404
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-
-[[headers]]
-  for = "/"
-  [headers.values]
-    Cache-Control = "no-cache, must-revalidate"
+      media-src 'self' data: blob:
+        https:
+        https://*.supabase.co
+        https://*.googlevideo.com
+        https://youtube.com;
+    "

@@ -5,11 +5,10 @@
 [functions]
   directory = "netlify/functions"
 
-# 🔐 Security Headers
+# ───────────── Security Headers ─────────────
 [[headers]]
   for = "/*"
   [headers.values]
-
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
@@ -19,45 +18,86 @@
     Cross-Origin-Resource-Policy = "same-site"
     X-Permitted-Cross-Domain-Policies = "none"
 
-    # 🔥 FIXED CSP
-    Content-Security-Policy = "
-      default-src 'self';
-      base-uri 'self';
-      frame-ancestors 'self';
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; frame-ancestors 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net https://translate.google.com https://translate.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.open-meteo.com https://wttr.in https://api.anthropic.com https://www.google-analytics.com https://region1.google-analytics.com https://*.supabase.co https://translate.googleapis.com; frame-src https://www.youtube.com https://player.vimeo.com; media-src 'self' data: blob: https: https://*.supabase.co https://*.googlevideo.com https://youtube.com;"
 
-      script-src 'self' 'unsafe-inline'
-        https://www.googletagmanager.com
-        https://www.google-analytics.com
-        https://cdn.jsdelivr.net
-        https://translate.google.com
-        https://translate.googleapis.com
-        https://www.gstatic.com;
+# ───────────── Sitemap ─────────────
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=3600"
+    Content-Type = "application/xml; charset=utf-8"
 
-      style-src 'self' 'unsafe-inline'
-        https://fonts.googleapis.com
-        https://cdn.jsdelivr.net;
+# ───────────── Robots ─────────────
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Type = "text/plain; charset=utf-8"
 
-      img-src 'self' data: blob: https:;
+# ───────────── HTML (no cache) ─────────────
+[[headers]]
+  for = "*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
 
-      font-src 'self' data:
-        https://fonts.gstatic.com;
+# ───────────── Static Files (long cache) ─────────────
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
-      connect-src 'self'
-        https://api.open-meteo.com
-        https://wttr.in
-        https://api.anthropic.com
-        https://www.google-analytics.com
-        https://region1.google-analytics.com
-        https://*.supabase.co
-        https://translate.googleapis.com;
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
-      frame-src
-        https://www.youtube.com
-        https://player.vimeo.com;
+[[headers]]
+  for = "*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
-      media-src 'self' data: blob:
-        https:
-        https://*.supabase.co
-        https://*.googlevideo.com
-        https://youtube.com;
-    "
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ───────────── Service Worker ─────────────
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# ───────────── Functions ─────────────
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/.netlify/functions/admin-auth"
+  [headers.values]
+    Cache-Control = "no-store"
+    X-Content-Type-Options = "nosniff"
+
+# ───────────── Redirects ─────────────
+[[redirects]]
+  from = "/404"
+  to = "/404.html"
+  status = 404
+
+# SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Root no cache
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"

@@ -3,47 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- 🔥 حط الـ CSP هنا -->
-  <meta http-equiv="Content-Security-Policy" content="
-default-src 'self';
-
-script-src 'self' 'unsafe-inline'
-https://www.googletagmanager.com
-https://www.google-analytics.com
-https://cdn.jsdelivr.net
-https://translate.google.com
-https://translate.googleapis.com
-https://translate-pa.googleapis.com
-https://www.gstatic.com;
-
-style-src 'self' 'unsafe-inline'
-https://cdn.jsdelivr.net;
-
-connect-src 'self'
-https://api.open-meteo.com
-https://wttr.in
-https://www.google-analytics.com
-https://region1.google-analytics.com
-https://*.supabase.co
-wss://*.supabase.co
-https://translate.googleapis.com
-https://translate-pa.googleapis.com
-https://images.unsplash.com
-https://cdn.jsdelivr.net;
-
-img-src 'self' data:
-https://images.unsplash.com
-https://cdn.jsdelivr.net
-https://*.tile.openstreetmap.org;
-
-font-src 'self'
-https://fonts.gstatic.com
-https://cdn.jsdelivr.net;
-">
 <title>واحة سدر السياحية | Wahat Sudr – رأس سدر جنوب سيناء</title>
 <!-- Service Worker — registered at bottom of page via external /sw.js -->
 <meta name="description" content="دليلك الشامل لاكتشاف جمال رأس سدر — فنادق، شواطئ ذهبية، عيون كبريتية علاجية، كايت سيرف، وأجمل المطاعم في جنوب سيناء على خليج السويس.">
@@ -331,13 +290,16 @@ nav.scrolled{box-shadow:0 4px 30px rgba(0,0,0,0.4)}
 .lang-globe{font-size:0.8rem;padding-right:2px;padding-left:4px}
 
 /* Hide Google Translate bar */
-/* اخفاء شريط جوجل */
-.goog-te-banner-frame { display: none !important; }
-body { top: 0 !important; }
+.goog-te-banner-frame{display:none!important}
+body{top:0!important}
+.skiptranslate{display:none!important}
+#google_translate_element{display:none!important}
+.goog-te-gadget{display:none!important}
 
-/* اخفاء اللوجو والكلام */
-.goog-logo-link { display:none !important; }
-.goog-te-gadget span { display:none !important; }
+.nav-toggle{
+  display:none;background:none;border:none;
+  color:var(--text-main);font-size:1.4rem;cursor:pointer;padding:5px;flex-shrink:0;
+}
 
 /* ============ HERO ============ */
 #home{
@@ -1459,7 +1421,7 @@ function _esc(str){
     .replace(/</g,'&lt;')
     .replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#39;');
+    .replace(/'/g,'&#039;');
 }
 // ═══ Simple SHA-256 hash — لتشفير كلمة مرور الأدمن ═══
 async function _sha256(str){
@@ -1639,8 +1601,8 @@ window._applyAnnouncementPayload = function(ann){
   <div class="nav-controls">
     <div class="lang-toggle" id="langToggle" title="تغيير اللغة / Change Language">
       <span class="lang-globe">🌐</span>
-      <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
-      <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+      <button class="lang-btn active" id="btnAr" onclick="setLang('ar')">العربية</button>
+      <button class="lang-btn" id="btnEn" onclick="setLang('en')">EN</button>
     </div>
     <button class="theme-toggle" id="themeToggle" aria-label="تبديل المظهر الداكن والفاتح" title="تبديل المظهر" onclick="toggleTheme()">🌙</button>
     <button class="nav-admin-btn" id="navAdminBtn" onclick="showAdminPanel()" title="لوحة التحكم" aria-label="لوحة التحكم">⚙️</button>
@@ -2861,10 +2823,12 @@ function getPlaceActionConfig(place, cfg){
 
 function getPlaceMapHref(place){
   const custom = String(place?.mapUrl || place?.mapQuery || '').trim();
-  if(custom && /^https?:\/\//i.test(custom)) return custom;
-  
-  const title = String(place?.title || 'رأس سدر').trim();
-  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(title + ' رأس سدر مصر');
+  if(custom){
+    if(/^https?:\/\//i.test(custom)) return custom;
+    return 'https://maps.google.com/?q=' + encodeURIComponent(custom);
+  }
+  const title = String(place?.title || '').trim();
+  return 'https://maps.google.com/?q=' + encodeURIComponent((title || 'رأس سدر') + ' رأس سدر مصر');
 }
 
 function getPlaceWhatsappHref(place){
@@ -3099,8 +3063,7 @@ function closeModal(e){ if(e.target===document.getElementById('modalOverlay')) c
 function closeModalDirect(){ document.getElementById('modalOverlay').classList.remove('active'); document.body.style.overflow=''; }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeModalDirect(); closeBookingDirect(); } });
 function openPlaceMap(name){
-  const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name + ' رأس سدر مصر');
-  window.open(url, '_blank');
+  openPlaceMapByUrl('https://maps.google.com/?q='+encodeURIComponent((name||'')+' رأس سدر مصر'));
 }
 
 // ========== BOOKING ==========
@@ -3679,9 +3642,7 @@ function calcDist(el, city){
   if(elTime)  elTime.textContent  = timeStr;
   if(elFuel)  elFuel.textContent  = '~' + fuel + ' لتر';
   if(elRoute) elRoute.innerHTML   = '🛣️ الطريق المقترح: <strong>' + d.via + '</strong>';
-  if(elGmaps) {
-  elGmaps.href = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(city + ', مصر') + '&destination=' + encodeURIComponent('رأس سدر، جنوب سيناء');
-}
+  if(elGmaps) elGmaps.href = 'https://www.google.com/maps/dir/' + encodeURIComponent(city + ',مصر') + '/' + encodeURIComponent('رأس سدر، جنوب سيناء');
   if(elRes){
     elRes.style.display = 'block';
     elRes.scrollIntoView({ behavior:'smooth', block:'nearest' });
@@ -10336,37 +10297,6 @@ if(/iPhone|iPad|iPod/.test(navigator.userAgent)&&!navigator.standalone){
 window.addEventListener('hashchange',function(){if(location.hash==='#blog'&&typeof scrollToSectionWithOffset==='function')scrollToSectionWithOffset('blog');});
 if(location.hash==='#blog')setTimeout(function(){if(typeof scrollToSectionWithOffset==='function')scrollToSectionWithOffset('blog');},600);
 </script>
-<!-- Google Translate (hidden system) -->
-<div id="google_translate_element" style="display:none"></div>
 
-<script>
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'ar',
-    autoDisplay: false
-  }, 'google_translate_element');
-}
-
-function setLanguage(lang) {
-  let tries = 0;
-
-  const interval = setInterval(() => {
-    const select = document.querySelector(".goog-te-combo");
-
-    if (select) {
-      select.value = lang;
-      select.dispatchEvent(new Event("change"));
-      clearInterval(interval);
-    }
-
-    tries++;
-    if (tries > 10) clearInterval(interval);
-  }, 300);
-}
-</script>
-
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

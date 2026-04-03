@@ -2,72 +2,74 @@
   "name": "واحة سدر السياحية",
   "short_name": "واحة سدر",
   "description": "دليلك الشامل لاكتشاف جمال رأس سدر — فنادق، شواطئ، عيون كبريتية، وكايت سيرف في جنوب سيناء",
-  "start_url": "/",
+
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "id": "/?source=pwa",
+
   "display": "standalone",
+  "orientation": "portrait-primary",
+
   "background_color": "#071A2C",
   "theme_color": "#071A2C",
+
   "lang": "ar",
   "dir": "rtl",
-  "orientation": "portrait-primary",
-  "scope": "/",
-  "id": "/",
+
   "categories": ["travel", "tourism", "lifestyle"],
+
   "icons": [
     {
-      "src": "/icon-72x72.png",
+      "src": "/icons/icon-72x72.png",
       "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
-      "src": "/icon-96x96.png",
+      "src": "/icons/icon-96x96.png",
       "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
-      "src": "/icon-128x128.png",
+      "src": "/icons/icon-128x128.png",
       "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
-      "src": "/icon-144x144.png",
+      "src": "/icons/icon-144x144.png",
       "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
-      "src": "/icon-192x192.png",
+      "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-192x192-maskable.png",
+      "src": "/icons/icon-192x192-maskable.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icon-384x384.png",
+      "src": "/icons/icon-384x384.png",
       "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
-      "src": "/icon-512x512.png",
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512x512-maskable.png",
+      "src": "/icons/icon-512x512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
   ],
+
   "screenshots": [
     {
       "src": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1280&h=720&fit=crop&fm=webp&auto=format",
@@ -84,36 +86,37 @@
       "label": "واحة سدر — عرض الموبايل"
     }
   ],
+
   "shortcuts": [
     {
       "name": "الأماكن السياحية",
       "short_name": "الأماكن",
       "description": "استعرض أبرز الأماكن في رأس سدر",
       "url": "/#places",
-      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "العروض والباقات",
       "short_name": "العروض",
       "description": "أحدث العروض السياحية",
       "url": "/#offers",
-      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "احجز الآن",
       "short_name": "احجز",
       "description": "تواصل معنا للحجز",
       "url": "/#contact",
-      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "المقالات",
       "short_name": "مقالات",
       "description": "مقالات ونصائح عن رأس سدر",
       "url": "/#blog",
-      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     }
   ],
-  "related_applications": [],
+
   "prefer_related_applications": false
 }

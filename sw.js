@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════
-// Service Worker — FINAL (No Admin Cache Issues)
+// Service Worker — FINAL (No Admin Cache Issues + Google Translate Fix)
 // Wahat Sudr
 // ═══════════════════════════════════════
 
@@ -36,12 +36,21 @@ function isAPIRequest(url) {
   return (
     url.includes('api.open-meteo.com') ||
     url.includes('wttr.in') ||
-    url.includes('supabase.co') // مهم عشان بيانات الأدمن
+    url.includes('supabase.co')
   );
 }
 
 function isAdminRequest(url) {
   return url.includes('/admin') || url.includes('admin');
+}
+
+// 🚨 NEW: Google Translate detection
+function isGoogleTranslate(url) {
+  return (
+    url.includes('translate.google.com') ||
+    url.includes('translate.googleapis.com') ||
+    url.includes('gstatic.com')
+  );
 }
 
 // ================= STRATEGIES =================
@@ -93,6 +102,12 @@ self.addEventListener('fetch', event => {
   // Skip Netlify internal
   if (url.includes('/.netlify/')) return;
 
+  // 🚨 IMPORTANT: Google Translate — bypass SW completely
+  if (isGoogleTranslate(url)) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   // 🚨 Admin requests — No Cache نهائي
   if (isAdminRequest(url)) {
     event.respondWith(fetch(event.request, { cache: 'no-store' }));
@@ -111,13 +126,13 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 🚨 HTML pages (أهم حاجة)
+  // HTML pages
   if (isHTMLRequest(event.request)) {
     event.respondWith(networkOnly(event.request));
     return;
   }
 
-  // JS / CSS — Network First خفيف
+  // JS / CSS — Network First
   event.respondWith(
     fetch(event.request)
       .then(res => res)

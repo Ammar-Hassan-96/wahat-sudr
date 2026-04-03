@@ -3,6 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 🔥 حط الـ CSP هنا -->
+  <meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline'
+  https://www.googletagmanager.com
+  https://www.google-analytics.com
+  https://cdn.jsdelivr.net
+  https://translate.google.com
+  https://translate.googleapis.com
+  https://translate-pa.googleapis.com
+  https://www.gstatic.com;
+
+  connect-src 'self'
+  https://api.open-meteo.com
+  https://wttr.in
+  https://www.google-analytics.com
+  https://region1.google-analytics.com
+  https://*.supabase.co
+  wss://*.supabase.co
+  https://translate.googleapis.com
+  https://translate-pa.googleapis.com
+  https://images.unsplash.com;
+  img-src 'self' data: https://images.unsplash.com;
+  style-src 'self' 'unsafe-inline';
+  font-src 'self' https://fonts.gstatic.com;">
 <title>واحة سدر السياحية | Wahat Sudr – رأس سدر جنوب سيناء</title>
 <!-- Service Worker — registered at bottom of page via external /sw.js -->
 <meta name="description" content="دليلك الشامل لاكتشاف جمال رأس سدر — فنادق، شواطئ ذهبية، عيون كبريتية علاجية، كايت سيرف، وأجمل المطاعم في جنوب سيناء على خليج السويس.">

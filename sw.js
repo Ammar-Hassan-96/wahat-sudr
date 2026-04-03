@@ -1,4 +1,4 @@
-const CACHE_VERSION = "ws-vAmmar1";
+const CACHE_VERSION = "wahat-v17";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 
@@ -36,11 +36,14 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const req = event.request;
 
+  // 🛑 تجاهل أي حاجة مش http/https (حل مشكلة chrome-extension)
+  if (!req.url.startsWith("http")) return;
+
   if (req.method !== "GET") return;
 
   const url = new URL(req.url);
 
-  // ❌ تجاهل أي API أو Supabase
+  // ❌ تجاهل Supabase / API
   if (
     url.hostname.includes("supabase") ||
     url.pathname.includes("/api/")
@@ -48,7 +51,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 🟢 HTML → Network First
+  // HTML → Network First
   if (req.headers.get("accept")?.includes("text/html")) {
     event.respondWith(
       fetch(req)
@@ -62,7 +65,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 🟡 Images → Cache First
+  // Images → Cache First
   if (req.destination === "image") {
     event.respondWith(
       caches.match(req).then((cached) => {
@@ -77,7 +80,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 🔵 JS/CSS → Cache First
+  // JS/CSS → Cache First
   event.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;

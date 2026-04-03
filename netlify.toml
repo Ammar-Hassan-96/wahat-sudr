@@ -19,7 +19,7 @@
     Cross-Origin-Resource-Policy = "same-site"
     X-Permitted-Cross-Domain-Policies = "none"
 
-    # ✅ CSP FINAL (FIXED بالكامل)
+    # 🚨 CSP FINAL — FIXED بالكامل
     Content-Security-Policy = "
     default-src 'self';
     base-uri 'self';
@@ -61,6 +61,7 @@
     https://wttr.in 
     https://www.google-analytics.com 
     https://region1.google-analytics.com 
+    https://cdn.jsdelivr.net
     https://*.supabase.co 
     wss://*.supabase.co
     https://translate.googleapis.com 
@@ -116,7 +117,7 @@
   [headers.values]
     Cache-Control = "public, max-age=86400"
 
-# Static assets
+# Static assets (سرعة)
 [[headers]]
   for = "/*.css"
   [headers.values]

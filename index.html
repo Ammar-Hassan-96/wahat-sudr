@@ -3411,37 +3411,41 @@ function _showGallerySkeleton(){
 }
 
 async function loadGallery(){
-  // 1. Show skeleton immediately — nothing renders until DB resolves
+  // نمط Stale-While-Revalidate:
+  // 1. اعرض skeleton
+  // 2. لو في cache حديث — اعرضه فوراً (بدون استنناء Supabase)
+  // 3. في الخلفية — حدّث من Supabase لو في فرق
   _showGallerySkeleton();
 
   let sbReady = (typeof SB_READY !== 'undefined') ? SB_READY : false;
 
-  if(sbReady){
-    try{
-      // 2. Wait for Supabase to return data (sbGet already has a 12s timeout)
-      const s=await sbGet('wahat_gallery');
-      if(Array.isArray(s)&&s.length){
-        // Fresh DB data — use it and cache it
-        galleryData=s;
-        _saveGalleryLocal();
-      } else {
-        // DB returned nothing — fall back to local cache, then defaults
-        _loadGalleryLocal();
-        if(!galleryData || !galleryData.length) galleryData=[..._DEFAULT_GALLERY];
-      }
-    }catch(e){
-      // Error — fall back to local cache, then defaults
-      _loadGalleryLocal();
-      if(!galleryData || !galleryData.length) galleryData=[..._DEFAULT_GALLERY];
-    }
+  // محاولة الـ cache أولاً (ws2_ format)
+  const cached = _lsGet('wahat_gallery', Infinity);
+  if(Array.isArray(cached) && cached.length){
+    galleryData = cached;
+    renderGallerySection();
   } else {
-    // Supabase not configured — use local cache, then defaults
+    // فضّل القديم
     _loadGalleryLocal();
     if(!galleryData || !galleryData.length) galleryData=[..._DEFAULT_GALLERY];
+    renderGallerySection();
   }
 
-  // 3. Now galleryData is guaranteed to have content — render replaces skeleton
-  renderGallerySection();
+  // في الخلفية — اجيب من Supabase وحدّث لو في فرق
+  if(!sbReady) return;
+  try{
+    const s = await sbGet('wahat_gallery');
+    if(Array.isArray(s) && s.length){
+      const oldStr = JSON.stringify(galleryData);
+      const newStr = JSON.stringify(s);
+      if(oldStr !== newStr){
+        galleryData = s;
+        _lsSet('wahat_gallery', s);
+        renderGallerySection();
+        console.log('[Gallery] Updated from Supabase');
+      }
+    }
+  }catch(e){ console.warn('[Gallery] fetch error:', e.message||e); }
 }
 
 // Call loadGallery after DOM + all scripts are loaded
@@ -4705,18 +4709,49 @@ async function sbSet(key, value){
   }
 }
 
-// ── Data helpers: Supabase first, localStorage fallback ──
+// ── Data helpers: Supabase first, timestamped localStorage fallback ──
+// كل قيمة محفوظة مع timestamp — يمنع ظهور بيانات قديمة أو stale
+const _LS_TTL = 10 * 60 * 1000; // 10 دقائق — بعدها نجيب من Supabase مباشرة
+
+function _lsSet(key, value){
+  try{
+    const payload = { v: value, t: Date.now() };
+    const str = JSON.stringify(payload);
+    if(str.length < 500000) localStorage.setItem('ws2_' + key, str);
+    // احتفظ بالـ key القديم للتوافق مع كود موجود
+    if(str.length < 500000) localStorage.setItem(key, JSON.stringify(value));
+  }catch(e){}
+}
+function _lsGet(key, maxAge){
+  try{
+    // جرب الـ format الجديد أول (مع timestamp)
+    const raw = localStorage.getItem('ws2_' + key);
+    if(raw){
+      const payload = JSON.parse(raw);
+      const age = Date.now() - (payload.t || 0);
+      const ttl = (typeof maxAge === 'number') ? maxAge : _LS_TTL;
+      if(age <= ttl) return payload.v;
+    }
+    // Fallback للـ format القديم (بدون timestamp) — يُعاد تهيئته
+    const legacy = localStorage.getItem(key);
+    if(legacy){
+      const val = JSON.parse(legacy);
+      // خلّه fresh بكتابته بالـ format الجديد
+      _lsSet(key, val);
+      return val;
+    }
+    return null;
+  }catch(e){ return null; }
+}
+
 async function loadFromDB(key, fallback=null){
   const remote = await sbGet(key);
-  if(remote !== null){ localStorage.setItem(key, JSON.stringify(remote)); return remote; }
-  const local = localStorage.getItem(key);
-  return local ? JSON.parse(local) : fallback;
+  if(remote !== null){ _lsSet(key, remote); return remote; }
+  const cached = _lsGet(key, Infinity); // fallback بدون TTL في حالة offline
+  return cached !== null ? cached : fallback;
 }
 async function saveToDB(key, value){
-  try {
-    const str = JSON.stringify(value);
-    if(str.length < 500000) localStorage.setItem(key, str);
-  } catch(e) { /* تجاهل QuotaExceededError */ }
+  _lsSet(key, value);
   const ok = await sbSet(key, value);
   return ok;
 }
@@ -5176,7 +5211,12 @@ function applyDataToSite(placesData, infoData){
 })();
 
 (async function initSiteData(){
-  // Show skeleton for places grid immediately — no flash of default/stale data
+  // ── نمط Stale-While-Revalidate ──
+  // 1. اعرض skeleton فوراً
+  // 2. لو في cache حديث (< 10 دقائق) — اعرضه فوراً بدون استنناء
+  // 3. في الخلفية — اجيب من Supabase وحدّث لو في فرق
+  // النتيجة: المستخدم يشوف المحتوى فوراً ودايماً يشوف الأحدث
+
   (function _showPlacesSkeleton(){
     const grid = document.getElementById('placesGrid');
     if(!grid) return;
@@ -5194,52 +5234,60 @@ function applyDataToSite(placesData, infoData){
     grid.innerHTML = sk;
   })();
 
-  async function fetchFromSupabase(){
+  // ── الخطوة 2: اعرض الـ cache فوراً لو موجود (بدون استنناء Supabase) ──
+  const cachedPlaces = _lsGet('wahat_places', Infinity);
+  const cachedInfo   = _lsGet('wahat_info',   Infinity);
+  if(cachedPlaces || cachedInfo){
+    applyDataToSite(cachedPlaces, cachedInfo);
+    _adminInfoCache = cachedInfo || {};
+    renderPlacesGrid();
+    console.log('[Init] Cache hit — rendered immediately');
+  }
+
+  // ── الخطوة 3: اجيب من Supabase في الخلفية وحدّث لو في فرق ──
+  if(!SB_READY) return;
+  try{
     const [places, info] = await Promise.all([
       sbGet('wahat_places'),
       sbGet('wahat_info')
     ]);
-    return { places, info };
-  }
 
-  try{
-    let result = await fetchFromSupabase();
+    let changed = false;
 
-    // لو Supabase رجع null — انتظر ثانيتين وجرب تاني (مهم على iOS)
-    if(!result.places && !result.info){
-      await new Promise(r => setTimeout(r, 2000));
-      result = await fetchFromSupabase();
+    if(places !== null){
+      const oldStr = JSON.stringify(cachedPlaces);
+      const newStr = JSON.stringify(places);
+      if(oldStr !== newStr){ changed = true; }
+      _lsSet('wahat_places', places);
+    }
+    if(info !== null){
+      const oldStr = JSON.stringify(cachedInfo);
+      const newStr = JSON.stringify(info);
+      if(oldStr !== newStr){ changed = true; }
+      _lsSet('wahat_info', info);
     }
 
-    const { places, info } = result;
-
-    // حفظ في localStorage للاستخدام offline
-    if(places){ try{ localStorage.setItem('wahat_places', JSON.stringify(places)); }catch(e){} }
-    if(info){ try{ localStorage.setItem('wahat_info', JSON.stringify(info)); }catch(e){} }
-
-    if(places || info){
-      applyDataToSite(places, info);
-    } else {
-      // لو Supabase فاشل — جيب من localStorage
-      const localPlaces = localStorage.getItem('wahat_places');
-      const localInfo = localStorage.getItem('wahat_info');
-      applyDataToSite(localPlaces ? JSON.parse(localPlaces) : null, localInfo ? JSON.parse(localInfo) : null);
-    }
-    _adminInfoCache = info || {};
-
-    // Render places (replaces skeleton) — gallery is handled exclusively by loadGallery()
-    renderPlacesGrid();
-  }catch(e){
-    console.warn('Init data error', e);
-    // Fallback — try localStorage, then render with defaults
-    try{
-      const localPlaces = localStorage.getItem('wahat_places');
-      const localInfo = localStorage.getItem('wahat_info');
-      if(localPlaces || localInfo){
-        applyDataToSite(localPlaces ? JSON.parse(localPlaces) : null, localInfo ? JSON.parse(localInfo) : null);
+    if(places !== null || info !== null){
+      _adminInfoCache = info || _adminInfoCache || {};
+      // لو في فرق أو مفيش cache — حدّث الصفحة
+      if(changed || (!cachedPlaces && !cachedInfo)){
+        applyDataToSite(places, info);
+        renderPlacesGrid();
+        console.log('[Init] Supabase data applied' + (changed ? ' (updated)' : ' (first load)'));
+      } else {
+        console.log('[Init] Supabase confirmed — no changes');
       }
-    }catch(le){}
-    renderPlacesGrid();
+    } else if(!cachedPlaces && !cachedInfo){
+      // Supabase فاشل ومفيش cache — اعرض defaults
+      applyDataToSite(null, null);
+      renderPlacesGrid();
+    }
+  }catch(e){
+    console.warn('[Init] Supabase fetch error:', e.message || e);
+    if(!cachedPlaces && !cachedInfo){
+      applyDataToSite(null, null);
+      renderPlacesGrid();
+    }
   }
 })();
 
@@ -6393,22 +6441,41 @@ const defaultOffers = [
 let _offersCache = null;
 
 async function loadOffers(){
-  // Show skeleton immediately
   const grid = document.getElementById('offersGrid');
-  if(grid){
-    let sk = '';
-    for(let i=0;i<3;i++) sk += '<div class="skeleton" style="height:280px;border-radius:24px"></div>';
-    grid.innerHTML = sk;
+
+  // اعرض الـ cache فوراً لو موجود
+  const cached = _lsGet('wahat_offers', Infinity);
+  if(Array.isArray(cached) && cached.length){
+    _offersCache = cached;
+    renderOffersGrid(cached);
+  } else {
+    // skeleton لحين التحميل
+    if(grid){
+      let sk = '';
+      for(let i=0;i<3;i++) sk += '<div class="skeleton" style="height:280px;border-radius:24px"></div>';
+      grid.innerHTML = sk;
+    }
   }
 
-  let offers = null;
-  if(SB_READY){
-    try{ const r=await sbGet('wahat_offers'); if(Array.isArray(r)&&r.length) offers=r; }catch(e){}
+  // اجيب من Supabase في الخلفية
+  if(!SB_READY){
+    if(!_offersCache || !_offersCache.length){ _offersCache=[...defaultOffers]; renderOffersGrid(_offersCache); }
+    return;
   }
-  // Fall back to defaults if nothing came back
-  if(!offers || !offers.length) offers = [...defaultOffers];
-  _offersCache = offers;
-  renderOffersGrid(offers);
+  try{
+    const r = await sbGet('wahat_offers');
+    if(Array.isArray(r) && r.length){
+      const changed = JSON.stringify(_offersCache) !== JSON.stringify(r);
+      _lsSet('wahat_offers', r);
+      _offersCache = r;
+      if(changed || !cached) renderOffersGrid(r);
+    } else if(!cached){
+      _offersCache = [...defaultOffers];
+      renderOffersGrid(_offersCache);
+    }
+  }catch(e){
+    if(!_offersCache || !_offersCache.length){ _offersCache=[...defaultOffers]; renderOffersGrid(_offersCache); }
+  }
 }
 
 function renderOffersGrid(offers){
@@ -7678,7 +7745,7 @@ if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('/sw.js', {scope:'/'})
       .then(function(reg){
-        console.log('[SW] Registered v2026-03-31-v10');
+        console.log('[SW] Registered v2026-04-05-v12');
         // Check for updates every 60 seconds
         setInterval(function(){ reg.update(); }, 60000);
         // When a new SW is found, activate it
@@ -7696,11 +7763,18 @@ if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){
       })
       .catch(function(e){ console.warn('[SW] Registration failed:', e); });
   });
-  // Listen for SW update messages
+  // Listen for SW update messages — guard against reload loop
   navigator.serviceWorker.addEventListener('message', function(event){
     if(event.data && event.data.type === 'SW_UPDATED'){
-      // Auto-reload to get fresh content
-      window.location.reload();
+      // لو الـ reload عمل من أقل من 30 ثانية — تجاهل (يمنع الـ loop)
+      const lastReload = parseInt(sessionStorage.getItem('_sw_reload_ts') || '0');
+      const now = Date.now();
+      if(now - lastReload < 30000) return;
+      sessionStorage.setItem('_sw_reload_ts', String(now));
+      // أظهر toast للمستخدم بدل الـ reload التلقائي المباشر
+      if(typeof showToast === 'function'){
+        showToast('✨ يوجد تحديث — اضغط لتحديث الصفحة', 'info');
+      }
     }
   });
 }
@@ -9599,16 +9673,35 @@ function _applyFooterToPage(data){
 // 🔄 Init — Load dynamic content on page load
 // ═══════════════════════════════════════════
 (async function _initDynamicContent(){
-  // Load Tips
-  let tips=await _loadTips();
-  _renderTipsOnPage(tips);
-  // Load FAQ
-  let faq=await _loadFaq();
-  _renderFaqOnPage(faq);
-  // Load Hero/About
-  if(SB_READY){ try{ let hero=await sbGet('wahat_hero');if(hero) _applyHeroToPage(hero); }catch(e){} }
-  // Load Footer/Emergency
-  if(SB_READY){ try{ let footer=await sbGet('wahat_footer');if(footer) _applyFooterToPage(footer); }catch(e){} }
+  // ── اعرض الـ cache فوراً (بدون استنناء) ──
+  const cTips   = _lsGet('wahat_tips',   Infinity);
+  const cFaq    = _lsGet('wahat_faq',    Infinity);
+  const cHero   = _lsGet('wahat_hero',   Infinity);
+  const cFooter = _lsGet('wahat_footer', Infinity);
+
+  if(cTips   && Array.isArray(cTips))   { _tipsData = cTips;  _renderTipsOnPage(cTips); }
+  else { let d=await _loadTips(); _renderTipsOnPage(d); }
+
+  if(cFaq    && Array.isArray(cFaq))    { _faqData  = cFaq;   _renderFaqOnPage(cFaq); }
+  else { let d=await _loadFaq();  _renderFaqOnPage(d); }
+
+  if(cHero   && typeof _applyHeroToPage  ==='function') _applyHeroToPage(cHero);
+  if(cFooter && typeof _applyFooterToPage==='function') _applyFooterToPage(cFooter);
+
+  // ── جيب كل حاجة من Supabase بـ batch موازي في الخلفية ──
+  if(!SB_READY) return;
+  try{
+    const [tips, faq, hero, footer] = await Promise.all([
+      sbGet('wahat_tips'),
+      sbGet('wahat_faq'),
+      sbGet('wahat_hero'),
+      sbGet('wahat_footer')
+    ]);
+    if(tips   && Array.isArray(tips))   { _lsSet('wahat_tips',tips);     _tipsData=tips;  _renderTipsOnPage(tips); }
+    if(faq    && Array.isArray(faq))    { _lsSet('wahat_faq',faq);       _faqData=faq;    _renderFaqOnPage(faq); }
+    if(hero   && typeof _applyHeroToPage  ==='function'){ _lsSet('wahat_hero',hero);     _applyHeroToPage(hero); }
+    if(footer && typeof _applyFooterToPage==='function'){ _lsSet('wahat_footer',footer); _applyFooterToPage(footer); }
+  }catch(e){ console.warn('[DynamicContent] batch fetch error:', e.message||e); }
 })();
 
 // Hook tab loading
@@ -10157,22 +10250,40 @@ let defaultBlogArticles = [
 let blogArticles=[];let blogEditIdx=-1;let currentBlogArticle=null;
 
 async function loadBlogArticles(){
-  // Show skeleton immediately
-  const grid = document.getElementById('blogGrid');
-  if(grid){
-    let sk = '';
-    for(let i=0;i<3;i++) sk += '<div class="skeleton" style="height:320px;border-radius:20px"></div>';
-    grid.innerHTML = sk;
+  // اعرض الـ cache فوراً
+  const cached = _lsGet('wahat_blog', Infinity);
+  if(Array.isArray(cached) && cached.length){
+    blogArticles = cached;
+    renderBlogGrid();
+    renderBlogAdmin();
+  } else {
+    // skeleton بدون cache
+    const grid = document.getElementById('blogGrid');
+    if(grid){
+      let sk = '';
+      for(let i=0;i<3;i++) sk += '<div class="skeleton" style="height:320px;border-radius:20px"></div>';
+      grid.innerHTML = sk;
+    }
   }
-
-  let fetched = null;
-  if(typeof SB_READY!=='undefined'&&SB_READY){
-    try{ const s=await sbGet('wahat_blog'); if(Array.isArray(s)&&s.length) fetched=s; }catch(e){}
+  // جيب من Supabase في الخلفية
+  if(typeof SB_READY==='undefined' || !SB_READY){
+    if(!blogArticles.length){ blogArticles=[...defaultBlogArticles]; renderBlogGrid(); renderBlogAdmin(); }
+    return;
   }
-  // Use DB data if available, otherwise fall back to defaults
-  blogArticles = fetched || [...defaultBlogArticles];
-  renderBlogGrid();
-  renderBlogAdmin();
+  try{
+    const s = await sbGet('wahat_blog');
+    if(Array.isArray(s) && s.length){
+      const changed = JSON.stringify(blogArticles) !== JSON.stringify(s);
+      _lsSet('wahat_blog', s);
+      blogArticles = s;
+      if(changed || !cached){ renderBlogGrid(); renderBlogAdmin(); }
+    } else if(!cached || !blogArticles.length){
+      blogArticles = [...defaultBlogArticles];
+      renderBlogGrid(); renderBlogAdmin();
+    }
+  }catch(e){
+    if(!blogArticles.length){ blogArticles=[...defaultBlogArticles]; renderBlogGrid(); renderBlogAdmin(); }
+  }
 }
 function renderBlogGrid(){
   let grid=document.getElementById('blogGrid');if(!grid)return;

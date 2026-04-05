@@ -8819,27 +8819,13 @@ document.addEventListener('keydown',function(e){
 });
 
 // ═══ Global Error Handler — يمنع crash الصفحة ═══
-// ═══ Global Error Handler — Production Safe ═══
-window.onerror = function (msg, url, line, col, err) {
-  console.group('🚨 [Wahat Error]');
-  console.error('Message:', msg);
-  console.error('File:', url);
-  console.error('Line:', line, 'Column:', col);
-  console.error('Error Object:', err);
-  console.groupEnd();
-
-  // ❌ مهم: ما نخبيش الخطأ أثناء التطوير
-  // رجّع false عشان المتصفح يكمّل عرض الخطأ الحقيقي
-  return false;
+window.onerror = function(msg, url, line, col, err){
+  console.error('[Wahat Error]', msg, 'at', url, ':', line);
+  return true; // Prevent default browser error handling
 };
-
-window.addEventListener('unhandledrejection', function (e) {
-  console.group('⚠️ [Wahat Promise Error]');
-  console.error('Reason:', e.reason);
-  console.groupEnd();
-
-  // ❌ برضه ما نخبيش الخطأ
-  // سيبه يظهر عادي أثناء التطوير
+window.addEventListener('unhandledrejection', function(e){
+  console.warn('[Wahat Promise Error]', e.reason);
+  e.preventDefault();
 });
 
 // ═══ Modal Focus Trap — Accessibility ═══

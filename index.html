@@ -8448,7 +8448,7 @@ function adminEditPlaceImages(key){
 function _renderPGrid(){
   let g=document.getElementById('piGrid');if(!g)return;
   if(!_placeImgs.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:16px;color:rgba(255,255,255,0.3);font-size:0.8rem">لا توجد صور</div>';return;}
-  g.innerHTML=_placeImgs.map(function(src,i){var _cross=src.includes('supabase.co')?' crossorigin="anonymous"':'';return'<div class="img-sort-item" draggable="true" ondragstart="_pDS(event,'+i+')" ondragover="_pDO(event)" ondrop="_pDR(event,'+i+')" ondragend="_pDE()"><img loading="lazy" src="'+_esc(src)+'" alt="صورة '+(i+1)+'"'+_cross+' onerror="this.onerror=null;this.style.opacity=\'0.2\'">'<div class="img-order">'+(i+1)+'</div><button class="img-del" onclick="_pDel('+i+')" title="حذف">✕</button></div>';}).join('');
+  g.innerHTML=_placeImgs.map(function(src,i){var _cross=src.includes('supabase.co')?' crossorigin="anonymous"':'';return'<div class="img-sort-item" draggable="true" ondragstart="_pDS(event,'+i+')" ondragover="_pDO(event)" ondrop="_pDR(event,'+i+')" ondragend="_pDE()"><img loading="lazy" src="'+_esc(src)+'" alt="صورة '+(i+1)+'"'+_cross+' onerror="this.onerror=null;this.style.opacity=\'0.2\'">'+'<div class="img-order">'+(i+1)+'</div><button class="img-del" onclick="_pDel('+i+')" title="حذف">✕</button></div>';}).join('');
 }
 async function addPImgs(inp){
   let files=Array.from(inp.files);if(!files.length)return;

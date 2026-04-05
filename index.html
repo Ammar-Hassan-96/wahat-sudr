@@ -3558,8 +3558,38 @@ function adminEditGallery(idx){
 }
 async function saveGalleryItem(){
   let url=document.getElementById('galleryImgUrl').value.trim();
-  // Support file upload (base64) or URL
-  let src = window._pendingGalleryImg || url;
+  let src = url;
+
+  // لو في ملف مرفوع — ارفعه على Supabase Storage
+  if(window._pendingGalleryFile && !url){
+    let file = window._pendingGalleryFile;
+    showToast('⏳ جاري رفع الصورة...','info');
+    try{
+      let ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+      let filename = 'gallery-'+Date.now()+'.'+ext;
+      let res = await fetch(SB_URL+'/storage/v1/object/place-images/'+filename,{
+        method:'POST',
+        headers:{
+          'apikey': SB_KEY,
+          'Authorization': 'Bearer '+SB_KEY,
+          'Content-Type': file.type||'image/jpeg',
+          'x-upsert': 'true'
+        },
+        body: file
+      });
+      if(res.ok){
+        src = SB_URL+'/storage/v1/object/public/place-images/'+filename;
+      } else {
+        src = await _fileToBase64(file); // fallback
+      }
+    }catch(e){
+      src = await _fileToBase64(file); // fallback
+    }
+    window._pendingGalleryFile = null;
+  } else if(window._pendingGalleryImg){
+    src = window._pendingGalleryImg;
+  }
+
   if(!src){alert('يرجى إدخال رابط أو رفع صورة/فيديو');return;}
   let isVid = _isVideoUrl(src);
   let thumb = src;
@@ -8226,11 +8256,12 @@ function _fileToBase64(file){
 // ── Gallery Admin (Upload + Reorder) ─────────────────────
 function previewGalleryFile(input){
   let file=input.files[0];if(!file)return;
-  _fileToBase64(file).then(function(b64){
-    let prev=document.getElementById('galleryImgPreview'),prevImg=document.getElementById('galleryPreviewImg');
-    if(prev&&prevImg){prevImg.src=b64;prev.style.display='block';}
-    window._pendingGalleryImg=b64;window._pendingGalleryUrl=null;
-  });
+  // عرض preview فوري بـ Object URL (أسرع من base64)
+  let objUrl = URL.createObjectURL(file);
+  let prev=document.getElementById('galleryImgPreview'),prevImg=document.getElementById('galleryPreviewImg');
+  if(prev&&prevImg){prevImg.src=objUrl;prev.style.display='block';}
+  window._pendingGalleryFile=file;
+  window._pendingGalleryImg=null;window._pendingGalleryUrl=null;
 }
 async function adminSaveGalleryOrder(){
   if(SB_READY)await sbSet('wahat_gallery',galleryData).catch(function(){});
@@ -8287,9 +8318,45 @@ function _renderPGrid(){
   g.innerHTML=_placeImgs.map(function(src,i){return'<div class="img-sort-item" draggable="true" ondragstart="_pDS(event,'+i+')" ondragover="_pDO(event)" ondrop="_pDR(event,'+i+')" ondragend="_pDE()"><img loading="lazy" src="'+_esc(src)+'" alt="صورة '+(i+1)+'"><div class="img-order">'+(i+1)+'</div><button class="img-del" onclick="_pDel('+i+')" title="حذف">✕</button></div>';}).join('');
 }
 async function addPImgs(inp){
-  let files=Array.from(inp.files);if(!files.length)return;showToast('⏳ جاري المعالجة...','info');
-  for(let i=0;i<files.length;i++)_placeImgs.push(await _fileToBase64(files[i]));
-  _renderPGrid();inp.value='';showToast('✅ تمت إضافة '+files.length+' صورة','success');
+  let files=Array.from(inp.files);if(!files.length)return;
+  showToast('⏳ جاري رفع الصور...','info');
+  let uploaded=0, failed=0;
+  for(let i=0;i<files.length;i++){
+    let file=files[i];
+    try{
+      // رفع على Supabase Storage مباشرة
+      let ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+      let filename = _editPlaceKey+'-'+Date.now()+'-'+i+'.'+ext;
+      let res = await fetch(SB_URL+'/storage/v1/object/place-images/'+filename,{
+        method:'POST',
+        headers:{
+          'apikey': SB_KEY,
+          'Authorization': 'Bearer '+SB_KEY,
+          'Content-Type': file.type || 'image/jpeg',
+          'x-upsert': 'true'
+        },
+        body: file
+      });
+      if(res.ok){
+        let url = SB_URL+'/storage/v1/object/public/place-images/'+filename;
+        _placeImgs.push(url);
+        uploaded++;
+      } else {
+        let err = await res.text();
+        console.warn('[Upload] failed:', err);
+        // fallback: base64 لو Storage فاشل
+        _placeImgs.push(await _fileToBase64(file));
+        uploaded++;
+      }
+    }catch(e){
+      console.warn('[Upload] error:', e);
+      // fallback base64
+      _placeImgs.push(await _fileToBase64(file));
+      uploaded++;
+    }
+  }
+  _renderPGrid();inp.value='';
+  showToast('✅ تمت إضافة '+uploaded+' صورة'+(failed?' ('+failed+' فشل)':''),'success');
 }
 function addPImgUrl(){let url=(document.getElementById('piUrl')||{}).value.trim();if(!url){showToast('أدخل رابط صحيح','warning');return;}_placeImgs.push(url);document.getElementById('piUrl').value='';_renderPGrid();showToast('✅ تمت الإضافة','success');}
 function _pDel(i){_placeImgs.splice(i,1);_renderPGrid();}

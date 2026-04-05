@@ -16,11 +16,11 @@
 <!-- لتفعيل Analytics: استبدل G-XXXXXXXXXX بـ Measurement ID من Google Analytics Dashboard -->
 <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
 <script>
-// GA disabled — placeholder ID detected, skip loading to avoid 404 requests
+// GA not configured — placeholder detected, analytics disabled
 window.dataLayer=window.dataLayer||[];
 function gtag(){dataLayer.push(arguments);}
-gtag('consent','default',{'analytics_storage':'denied','ad_storage':'denied','wait_for_update':500});
-window.wahatTrack=function(n,p){ /* GA not configured yet */ };
+gtag('consent','default',{'analytics_storage':'denied','ad_storage':'denied'});
+window.wahatTrack=function(n,p){}; // no-op until GA is configured
 </script>
 <!-- ═══ Webmaster — ⚠️ ضع الكودات الحقيقية من Google Search Console و Bing Webmaster ═══ -->
 <!-- <meta name="google-site-verification" content="YOUR_GOOGLE_CODE"> -->
@@ -157,6 +157,7 @@ html{scroll-behavior:smooth}
 #announcementBar, #announcementBar * { color:#fff !important; }
 body{
   font-family:'Cairo',sans-serif;
+  padding-bottom:env(safe-area-inset-bottom);
   background:var(--navy);
   color:var(--text-main);
   overflow-x:hidden;
@@ -200,6 +201,8 @@ nav{
   -webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid rgba(201,168,76,0.25);
   padding:0 20px;
+  padding-left:max(20px, env(safe-area-inset-left));
+  padding-right:max(20px, env(safe-area-inset-right));
   display:flex;justify-content:space-between;align-items:center;
   height:70px;transition:all var(--transition);
   gap:8px;
@@ -845,30 +848,49 @@ section{padding:90px 40px;max-width:1200px;margin:0 auto}
 .review-card.new-review{border-color:rgba(201,168,76,0.35);animation:newReviewIn .5s ease}
 @keyframes newReviewIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .modal-overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,0.78);backdrop-filter:blur(8px);
-  z-index:9999;align-items:center;justify-content:center;padding:20px;
+  display:none;position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.82);backdrop-filter:blur(8px);
+  z-index:9999;
+  align-items:flex-start;justify-content:center;
+  padding:80px 16px 20px;
+  overflow-y:auto;
 }
 .modal-overlay.active{display:flex}
 .modal{
   background:var(--navy-mid);border:1px solid rgba(201,168,76,0.25);
   border-radius:28px;max-width:560px;width:100%;padding:35px;
-  position:relative;animation:modalIn 0.3s ease;max-height:90vh;overflow-y:auto;
+  position:relative;animation:modalIn 0.3s ease;
+  box-sizing:border-box;
+  margin:0 auto;
+  flex-shrink:0;
+}
+@media(max-width:600px){
+  .modal-overlay{padding:75px 10px 16px}
+  .modal{padding:20px 16px;border-radius:20px}
+}
+@media(max-width:420px){
+  .modal-overlay{padding:72px 8px 12px}
+  .modal{padding:16px 12px;border-radius:16px}
 }
 @keyframes modalIn{from{opacity:0;transform:scale(0.92) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .modal-close{
-  position:absolute;top:14px;left:14px;
-  background:rgba(0,0,0,0.55);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-  border:1.5px solid rgba(255,255,255,0.22);
+  position:sticky;
+  top:0;
+  float:left;
+  margin:0 0 -44px 0;
+  background:rgba(0,0,0,0.65);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border:1.5px solid rgba(255,255,255,0.3);
   color:#fff;
-  width:38px;height:38px;border-radius:50%;cursor:pointer;
-  font-size:1.05rem;font-weight:700;
+  width:42px;height:42px;border-radius:50%;cursor:pointer;
+  font-size:1.1rem;font-weight:700;
   display:flex;align-items:center;justify-content:center;
   transition:all .2s ease;
-  box-shadow:0 4px 16px rgba(0,0,0,0.45);
-  z-index:10;
+  box-shadow:0 4px 16px rgba(0,0,0,0.5);
+  z-index:20;
+  flex-shrink:0;
 }
 .modal-close:hover{
   background:rgba(220,30,30,0.8);
@@ -880,6 +902,12 @@ section{padding:90px 40px;max-width:1200px;margin:0 auto}
 .modal-carousel{
   width:100%;height:230px;border-radius:18px;overflow:hidden;
   margin-bottom:22px;position:relative;background:#0d2b45;
+}
+@media(max-width:600px){
+  .modal-carousel{height:200px;border-radius:14px;margin-bottom:16px}
+}
+@media(max-width:420px){
+  .modal-carousel{height:185px;border-radius:12px}
 }
 .carousel-track{
   display:flex;width:100%;height:100%;
@@ -926,6 +954,7 @@ section{padding:90px 40px;max-width:1200px;margin:0 auto}
 .modal-title{font-size:1.5rem;font-weight:800;margin-bottom:10px;font-family:'Tajawal',sans-serif;color:var(--text-main)}
 .modal-desc{color:var(--text-muted);font-size:0.9rem;line-height:1.8;margin-bottom:20px}
 .modal-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:25px}
+@media(max-width:420px){.modal-info-grid{grid-template-columns:1fr;gap:8px}}
 .modal-info-item{
   background:rgba(255,255,255,0.04);border:1px solid var(--card-border);
   border-radius:14px;padding:14px;
@@ -1250,6 +1279,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offse
   .hero-title{font-size:1.9rem}
   .hero-stats{gap:20px}
   .places-grid{grid-template-columns:1fr}
+  .card-img{height:190px}
   .reviews-grid{grid-template-columns:1fr}
   .footer-grid{grid-template-columns:1fr}
   .footer-bottom{flex-direction:column;text-align:center}
@@ -1259,6 +1289,8 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offse
   .filter-btn{padding:8px 14px;font-size:0.8rem}
   .contact-channels{flex-direction:column;align-items:center}
   .gallery-grid{grid-template-columns:1fr;grid-template-rows:auto}
+  .gallery-item{min-height:200px}
+  .gallery-item img{object-fit:cover;width:100%;height:100%}
   .cities-grid{grid-template-columns:repeat(2,1fr)}
   .weather-live-bar{justify-content:center}
   .scroll-top{right:90px;bottom:96px}
@@ -2879,6 +2911,21 @@ function _showPlacesError(msg){
     </div>`;
 }
 
+function _fixStorageImgCors(){
+  // Android Chrome يحتاج crossorigin="anonymous" لصور Supabase Storage
+  try{
+    document.querySelectorAll('.card-img img, .carousel-slide img').forEach(function(img){
+      if(img.src && img.src.includes('supabase.co') && !img.hasAttribute('crossorigin')){
+        img.setAttribute('crossorigin','anonymous');
+        // reload الـ src عشان يطبق الـ crossorigin
+        var src = img.src;
+        img.src = '';
+        img.src = src;
+      }
+    });
+  }catch(e){}
+}
+
 function renderPlacesGrid(){
   const grid = document.getElementById('placesGrid');
   if(!grid) return;
@@ -2903,7 +2950,7 @@ function renderPlacesGrid(){
     return `
     <div class="place-card reveal" data-category="${_esc(cfg.cat)}" onclick="openModal('${_esc(key)}')">
       <div class="card-img ${_esc(p.bg)}">
-        ${img ? (_isVideoUrl(img) ? (_getYoutubeId(img) ? `<img src="https://img.youtube.com/vi/${_getYoutubeId(img)}/hqdefault.jpg" alt="${_esc(p.title)}" loading="lazy"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:3"><span style="color:#fff;font-size:1.2rem;margin-right:-2px">\u25b6</span></div>` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:3rem">\ud83c\udfac</div>`) : `<img src="${_esc(img)}" alt="${_esc(p.title)}" loading="lazy" onerror="this.style.display='none'">`) : ''}
+        ${img ? (_isVideoUrl(img) ? (_getYoutubeId(img) ? `<img src="https://img.youtube.com/vi/${_getYoutubeId(img)}/hqdefault.jpg" alt="${_esc(p.title)}" loading="lazy"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:3"><span style="color:#fff;font-size:1.2rem;margin-right:-2px">\u25b6</span></div>` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:3rem">\ud83c\udfac</div>`) : `<img src="${_esc(img)}" alt="${_esc(p.title)}" loading="lazy" decoding="async" onerror="this.onerror=null;this.style.opacity='0.3'">`) : ''}
         <div class="img-overlay"></div>
         <div class="card-category-tag">${_esc(cfg.tag)}</div>
         <div class="card-rating">${_esc(p.emoji)}</div>
@@ -2997,9 +3044,13 @@ function openModal(id){
       if(_isVideoUrl(src)){
         let ytId=_getYoutubeId(src);
         if(ytId) return '<div class="carousel-slide" style="position:relative;cursor:pointer" onclick="playCarouselVideo(this,\''+src+'\')"><img src="https://img.youtube.com/vi/'+ytId+'/hqdefault.jpg" alt="'+_esc(data.title)+'" loading="'+(i===0?'eager':'lazy')+'"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="width:60px;height:60px;border-radius:50%;background:rgba(255,0,0,0.85);display:flex;align-items:center;justify-content:center"><span style="color:#fff;font-size:1.6rem;margin-right:-3px">\u25b6</span></div></div></div>';
+        if(typeof _isFacebookVideo==='function'&&_isFacebookVideo(src)) return '<div class="carousel-slide" style="position:relative;cursor:pointer;background:linear-gradient(135deg,#1877F2,#0a5fc2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px" onclick="playCarouselVideo(this,\''+_esc(src)+'\')"><span style="font-size:2.5rem">📘</span><span style="color:#fff;font-size:0.85rem;font-weight:700">فيديو فيسبوك</span></div>';
         return '<div class="carousel-slide" style="position:relative;cursor:pointer;background:var(--navy-mid);display:flex;align-items:center;justify-content:center" onclick="playCarouselVideo(this,\''+_esc(src)+'\')"><span style="font-size:3rem">\ud83c\udfac</span><div style="position:absolute;bottom:10px;color:rgba(255,255,255,0.5);font-size:0.8rem">\u0627\u0636\u063a\u0637 \u0644\u0644\u062a\u0634\u063a\u064a\u0644</div></div>';
       }
-      return '<div class="carousel-slide"><img src="'+_esc(src)+'" alt="'+_esc(data.title)+'" loading="'+(i===0?'eager':'lazy')+'" onerror="this.parentNode.style.background=\'var(--navy-mid)\'"></div>';
+      // crossOrigin anonymous للـ Supabase Storage URLs عشان Android Chrome
+      var isStorage = src.includes('supabase.co/storage');
+      var crossAttr = isStorage ? ' crossorigin="anonymous"' : '';
+      return '<div class="carousel-slide"><img src="'+_esc(src)+'" alt="'+_esc(data.title)+'" loading="'+(i===0?'eager':'lazy')+'" decoding="async"'+crossAttr+' onerror="this.onerror=null;this.style.opacity=\'0.3\'"></div>';
     }).join('');
   const dots=_carImgs.length>1?`<div class="carousel-dots">${_carImgs.map((_,i)=>`<button class="carousel-dot${i===0?' active':''}" onclick="carouselGo(${i})"></button>`).join('')}</div>`:'';
   const nav=_carImgs.length>1?`<button class="carousel-btn prev" onclick="carouselStep(1)">&#8249;</button><button class="carousel-btn next" onclick="carouselStep(-1)">&#8250;</button><div class="carousel-counter"><span id="carNum">1</span>/${_carImgs.length}</div>`:'';
@@ -3017,7 +3068,9 @@ function openModal(id){
       <a href="${_esc(waHref || '#')}" target="_blank" rel="noopener noreferrer" class="card-btn-main" style="flex:1.5;background:linear-gradient(135deg,#25D366,#128C7E)" ${waDisabledAttr}>${_esc(actionCfg.whatsappLabel)}</a>
       <a href="${_esc(mapHref)}" target="_blank" rel="noopener noreferrer" class="card-btn-main" style="flex:1.4;background:rgba(201,168,76,0.14);border:1px solid rgba(201,168,76,0.3);color:var(--gold-light)">${_esc(actionCfg.mapLabel)}</a>
     </div>`;
-  document.getElementById('modalOverlay').classList.add('active');
+  const _ov = document.getElementById('modalOverlay');
+  _ov.classList.add('active');
+  _ov.scrollTop = 0; // تأكد إن الـ modal يبدأ من الأعلى دايماً
   document.body.style.overflow='hidden';
 }
 function carouselGo(idx){
@@ -3029,6 +3082,8 @@ function carouselGo(idx){
 function carouselStep(dir){carouselGo((_carIdx-dir+_carImgs.length)%_carImgs.length);}
 function playCarouselVideo(el, src){
   let ytId=_getYoutubeId(src);let vmId=_getVimeoId(src);
+  let isFB=typeof _isFacebookVideo==='function'&&_isFacebookVideo(src);
+  if(isFB){el.innerHTML='<iframe src="'+_getFacebookEmbedUrl(src)+'" style="width:100%;height:100%;border:none;border-radius:12px" allow="autoplay;encrypted-media" allowfullscreen></iframe>';return;}
   if(ytId){el.innerHTML='<iframe src="https://www.youtube.com/embed/'+ytId+'?autoplay=1&rel=0" style="width:100%;height:100%;border:none" allow="autoplay;encrypted-media;picture-in-picture" allowfullscreen></iframe>';}
   else if(vmId){el.innerHTML='<iframe src="https://player.vimeo.com/video/'+vmId+'?autoplay=1" style="width:100%;height:100%;border:none" allow="autoplay" allowfullscreen></iframe>';}
   else{el.innerHTML='<video src="'+_esc(src)+'" controls autoplay style="width:100%;height:100%;object-fit:contain"></video>';}
@@ -5294,6 +5349,7 @@ function applyDataToSite(placesData, infoData){
     applyDataToSite(cachedPlaces, cachedInfo);
     _adminInfoCache = cachedInfo || {};
     renderPlacesGrid();
+    setTimeout(_fixStorageImgCors, 500);
     if(typeof renderCompareGrid==='function') setTimeout(renderCompareGrid, 100);
     console.log('[Init] Cache hit — rendered immediately');
   }
@@ -5326,8 +5382,8 @@ function applyDataToSite(placesData, infoData){
       if(changed || (!cachedPlaces && !cachedInfo)){
         applyDataToSite(places, info);
         renderPlacesGrid();
+        setTimeout(_fixStorageImgCors, 300);
         if(typeof renderCompareGrid==='function') setTimeout(renderCompareGrid, 100);
-        // تحديث الخريطة لو في map_points جديدة
         if(typeof _rebuildMap==='function') setTimeout(_rebuildMap, 200);
         console.log('[Init] Supabase data applied' + (changed ? ' (updated)' : ' (first load)'));
       } else {
@@ -7834,7 +7890,7 @@ if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('/sw.js', {scope:'/'})
       .then(function(reg){
-        console.log('[SW] Registered v2026-04-05-v12');
+        console.log('[SW] Registered v2026-04-05-v13');
         // Check for updates every 60 seconds
         setInterval(function(){ reg.update(); }, 60000);
         // When a new SW is found, activate it

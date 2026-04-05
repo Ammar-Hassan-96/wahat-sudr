@@ -5499,7 +5499,8 @@ function _adminMediaThumb(src){
     if(ytId) return '<div style="position:relative;width:100%;height:100%"><img loading="lazy" src="https://img.youtube.com/vi/'+ytId+'/default.jpg" style="width:100%;height:100%;object-fit:cover;display:block"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="color:#fff;font-size:1rem;background:rgba(255,0,0,0.8);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center">\u25b6</span></div></div>';
     return '<div style="width:100%;height:100%;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center"><span style="font-size:1.5rem">\ud83c\udfac</span></div>';
   }
-  return '<img loading="lazy" src="'+_esc(src)+'" alt="\u0635\u0648\u0631\u0629" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.opacity=\'0.3\'">';
+  var _cross = src.includes('supabase.co') ? ' crossorigin="anonymous"' : '';
+  return '<img loading="lazy" src="'+_esc(src)+'" alt="صورة" style="width:100%;height:100%;object-fit:cover;display:block"'+_cross+' onerror="this.onerror=null;this.style.opacity=\'0.2\'">';
 }
 
 function renderAdminPlaces(){
@@ -5543,7 +5544,7 @@ function renderAdminPlaces(){
               ondrop="event.preventDefault();event.currentTarget.style.outline='none';event.currentTarget.style.opacity='1';adminReorderImg('${key}',${i})"
               ondragend="event.currentTarget.style.opacity='1';event.currentTarget.style.outline='none'">
               <div style="position:relative;width:72px;height:60px;border-radius:8px;overflow:hidden;border:2px solid rgba(255,255,255,0.12)">
-                <img loading="lazy" src="${_esc(src)}" alt="صورة المكان" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.opacity='0.3'">
+                <img loading="lazy" src="${_esc(src)}" alt="صورة المكان" style="width:100%;height:100%;object-fit:cover;display:block" ${_esc(src).includes('supabase.co') ? 'crossorigin="anonymous"' : ''} onerror="this.onerror=null;this.style.opacity='0.2';this.style.background='rgba(255,255,255,0.05)'">
                 <div style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(7,26,44,0.9);color:rgba(255,255,255,0.8);font-size:0.58rem;font-weight:900;display:flex;align-items:center;justify-content:center">${i+1}</div>
               </div>
               <div style="display:flex;justify-content:space-between;margin-top:3px;gap:2px">
@@ -5604,7 +5605,7 @@ function renderAdminHotels(){
               ondrop="event.preventDefault();event.currentTarget.style.outline='none';event.currentTarget.style.opacity='1';adminReorderImg('${key}',${i})"
               ondragend="event.currentTarget.style.opacity='1';event.currentTarget.style.outline='none'">
               <div style="position:relative;width:72px;height:60px;border-radius:8px;overflow:hidden;border:2px solid rgba(255,255,255,0.12)">
-                <img loading="lazy" src="${_esc(src)}" alt="صورة المكان" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.opacity='0.3'">
+                <img loading="lazy" src="${_esc(src)}" alt="صورة المكان" style="width:100%;height:100%;object-fit:cover;display:block" ${_esc(src).includes('supabase.co') ? 'crossorigin="anonymous"' : ''} onerror="this.onerror=null;this.style.opacity='0.2';this.style.background='rgba(255,255,255,0.05)'">
                 <div style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(7,26,44,0.9);color:rgba(255,255,255,0.8);font-size:0.58rem;font-weight:900;display:flex;align-items:center;justify-content:center">${i+1}</div>
               </div>
               <div style="display:flex;justify-content:space-between;margin-top:3px;gap:2px">
@@ -8424,7 +8425,7 @@ function adminLoadPlaces(){
   list.innerHTML=entries.map(function(e){
     let key=e[0],p=e[1],img=(p.images&&p.images[0])||'';
     return'<div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px;margin-bottom:8px">'
-      +'<div style="width:56px;height:56px;border-radius:8px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,0.08)">'+(img?'<img loading="lazy" src="'+_esc(img)+'" alt="'+_esc(p.title)+'" style="width:100%;height:100%;object-fit:cover">'  :'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem">'+_esc(p.emoji)+'</div>')+'</div>'
+      +'<div style="width:56px;height:56px;border-radius:8px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,0.08)">'+(img?'<img loading="lazy" src="'+_esc(img)+'" alt="'+_esc(p.title)+'" style="width:100%;height:100%;object-fit:cover"'+(img.includes('supabase.co')?' crossorigin="anonymous"':'')+' onerror="this.onerror=null;this.style.opacity=\'0.2\'">'  :'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem">'+_esc(p.emoji)+'</div>')+'</div>'
       +'<div style="flex:1;min-width:0"><div style="color:#fff;font-size:0.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.title+'</div><div style="color:rgba(255,255,255,0.4);font-size:0.7rem">'+(p.images?p.images.length:0)+' صورة</div></div>'
       +'<button onclick="adminEditPlaceImages(\''+key+'\')" style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);color:#E8C97A;border-radius:8px;padding:5px 10px;cursor:pointer;font-family:Cairo,sans-serif;font-size:0.75rem;font-weight:700;flex-shrink:0">🖼️ الصور</button>'
       +'</div>';
@@ -8447,7 +8448,7 @@ function adminEditPlaceImages(key){
 function _renderPGrid(){
   let g=document.getElementById('piGrid');if(!g)return;
   if(!_placeImgs.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:16px;color:rgba(255,255,255,0.3);font-size:0.8rem">لا توجد صور</div>';return;}
-  g.innerHTML=_placeImgs.map(function(src,i){return'<div class="img-sort-item" draggable="true" ondragstart="_pDS(event,'+i+')" ondragover="_pDO(event)" ondrop="_pDR(event,'+i+')" ondragend="_pDE()"><img loading="lazy" src="'+_esc(src)+'" alt="صورة '+(i+1)+'"><div class="img-order">'+(i+1)+'</div><button class="img-del" onclick="_pDel('+i+')" title="حذف">✕</button></div>';}).join('');
+  g.innerHTML=_placeImgs.map(function(src,i){var _cross=src.includes('supabase.co')?' crossorigin="anonymous"':'';return'<div class="img-sort-item" draggable="true" ondragstart="_pDS(event,'+i+')" ondragover="_pDO(event)" ondrop="_pDR(event,'+i+')" ondragend="_pDE()"><img loading="lazy" src="'+_esc(src)+'" alt="صورة '+(i+1)+'"'+_cross+' onerror="this.onerror=null;this.style.opacity=\'0.2\'">'<div class="img-order">'+(i+1)+'</div><button class="img-del" onclick="_pDel('+i+')" title="حذف">✕</button></div>';}).join('');
 }
 async function addPImgs(inp){
   let files=Array.from(inp.files);if(!files.length)return;
@@ -10154,7 +10155,7 @@ async function _adminSaveQuiz(){
       let selected=_selectedHotels.indexOf(h.key)!==-1;
       return '<div style="background:var(--card-bg);border:2px solid '+(selected?'var(--gold)':'var(--card-border)')+';border-radius:20px;overflow:hidden;cursor:pointer;transition:all 0.3s;'+(selected?'box-shadow:0 0 0 3px rgba(201,168,76,0.2)':'')+'" onclick="_toggleCompare(\''+_esc(h.key)+'\')">'
         +'<div style="height:150px;overflow:hidden;position:relative">'
-        +(img?'<img src="'+_esc(img)+'" alt="'+_esc(h.data.title)+'" loading="lazy" style="width:100%;height:100%;object-fit:cover">':'<div style="width:100%;height:100%;background:linear-gradient(135deg,#0A4A5A,#0D6B80);display:flex;align-items:center;justify-content:center;font-size:3rem">'+_esc(h.data.emoji)+'</div>')
+        +(img?'<img src="'+_esc(img)+'" alt="'+_esc(h.data.title)+'" loading="lazy" style="width:100%;height:100%;object-fit:cover"'+(_esc(img).includes('supabase.co')?' crossorigin="anonymous"':'')+'  onerror="this.onerror=null;this.style.opacity=\'0.2\'">'':'<div style="width:100%;height:100%;background:linear-gradient(135deg,#0A4A5A,#0D6B80);display:flex;align-items:center;justify-content:center;font-size:3rem">'+_esc(h.data.emoji)+'</div>')
         +(selected?'<div style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--navy)">✓</div>':'')
         +'</div>'
         +'<div style="padding:16px">'
@@ -10188,7 +10189,7 @@ async function _adminSaveQuiz(){
     if(hotels.length<2){res.style.display='none';return;}
 
     let rows=[
-      {label:'📸 الصورة',fn:function(h){let img=(h.images&&h.images[0])||'';return img?'<img src="'+_esc(img)+'" alt="'+_esc(h.title)+'" style="width:100%;height:80px;object-fit:cover;border-radius:10px">':'<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:rgba(255,255,255,0.04);border-radius:10px">'+_esc(h.emoji)+'</div>';}},
+      {label:'📸 الصورة',fn:function(h){let img=(h.images&&h.images[0])||'';return img?'<img src="'+_esc(img)+'" alt="'+_esc(h.title)+'" style="width:100%;height:80px;object-fit:cover;border-radius:10px"'+(img.includes('supabase.co')?' crossorigin="anonymous"':'')+' onerror="this.onerror=null;this.style.opacity=\'0.2\'">'  :'<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:rgba(255,255,255,0.04);border-radius:10px">'+_esc(h.emoji)+'</div>';}},
       {label:'🏨 الاسم',fn:function(h){return '<strong style="color:#fff">'+_esc(h.title)+'</strong>';}},
       {label:'💰 السعر',fn:function(h){return '<span style="color:var(--gold-light);font-weight:700">'+(h.info&&h.info[0]?_esc(h.info[0].value):'—')+'</span>';}},
       {label:'🕐 الأوقات',fn:function(h){return '<span style="color:#80E0FF">'+(h.info&&h.info[1]?_esc(h.info[1].value):'—')+'</span>';}},

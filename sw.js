@@ -3,7 +3,7 @@
 //  v2026-04-05-v12 (Network-First + Reliable Offline)
 // ══════════════════════════════════════════════
 
-const CACHE_VERSION = 'ws-v2026-04-05-v12';
+const CACHE_VERSION = 'ws-v2026-04-05-v13';
 const STATIC_CACHE  = `${CACHE_VERSION}-static`;
 const IMAGES_CACHE  = `${CACHE_VERSION}-images`;
 const API_CACHE     = `${CACHE_VERSION}-api`;

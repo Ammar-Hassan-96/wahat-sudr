@@ -5265,6 +5265,7 @@ function applyDataToSite(placesData, infoData){
     applyDataToSite(cachedPlaces, cachedInfo);
     _adminInfoCache = cachedInfo || {};
     renderPlacesGrid();
+    if(typeof renderCompareGrid==='function') setTimeout(renderCompareGrid, 100);
     console.log('[Init] Cache hit — rendered immediately');
   }
 
@@ -5296,6 +5297,7 @@ function applyDataToSite(placesData, infoData){
       if(changed || (!cachedPlaces && !cachedInfo)){
         applyDataToSite(places, info);
         renderPlacesGrid();
+        if(typeof renderCompareGrid==='function') setTimeout(renderCompareGrid, 100);
         console.log('[Init] Supabase data applied' + (changed ? ' (updated)' : ' (first load)'));
       } else {
         console.log('[Init] Supabase confirmed — no changes');

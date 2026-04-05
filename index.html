@@ -4787,7 +4787,7 @@ async function sbGet(key){
             'Cache-Control': 'no-cache'
           }
         }),
-        _sbTimeout(12000)
+        _sbTimeout(6000)
       ]);
       if(!r.ok){ _sbLog('GET', 'HTTP ' + r.status + ' — key: ' + key); return null; }
       const d = await r.json();
@@ -4814,7 +4814,7 @@ async function sbSet(key, value){
         },
         body: JSON.stringify({key, value, updated_at: new Date().toISOString()})
       }),
-      _sbTimeout(10000)
+      _sbTimeout(6000)
     ]);
     if(!r.ok){ _sbLog('SET', 'HTTP ' + r.status + ' — key: ' + key); return false; }
     return true;

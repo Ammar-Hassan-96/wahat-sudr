@@ -14,7 +14,7 @@
 <link rel="canonical" href="https://wahat-sudr.netlify.app/">
 <!-- ═══ Google Analytics 4 — ⚠️ GA_ID غير مفعّل — ضع Measurement ID الحقيقي هنا ═══ -->
 <!-- لتفعيل Analytics: استبدل G-XXXXXXXXXX بـ Measurement ID من Google Analytics Dashboard -->
-<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
+<!-- <!-- GA script removed — placeholder ID, configure real ID first --> -->
 <script>
 // GA not configured — placeholder detected, analytics disabled
 window.dataLayer=window.dataLayer||[];
@@ -7891,7 +7891,7 @@ if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('/sw.js', {scope:'/'})
       .then(function(reg){
-        console.log('[SW] Registered v2026-04-05-v13');
+        console.log('[SW] Registered v2026-04-05-v14');
         // Check for updates every 60 seconds
         setInterval(function(){ reg.update(); }, 60000);
         // When a new SW is found, activate it
@@ -10155,7 +10155,7 @@ async function _adminSaveQuiz(){
       let selected=_selectedHotels.indexOf(h.key)!==-1;
       return '<div style="background:var(--card-bg);border:2px solid '+(selected?'var(--gold)':'var(--card-border)')+';border-radius:20px;overflow:hidden;cursor:pointer;transition:all 0.3s;'+(selected?'box-shadow:0 0 0 3px rgba(201,168,76,0.2)':'')+'" onclick="_toggleCompare(\''+_esc(h.key)+'\')">'
         +'<div style="height:150px;overflow:hidden;position:relative">'
-        +(img?'<img src="'+_esc(img)+'" alt="'+_esc(h.data.title)+'" loading="lazy" style="width:100%;height:100%;object-fit:cover"'+(_esc(img).includes('supabase.co')?' crossorigin="anonymous"':'')+'  onerror="this.onerror=null;this.style.opacity=\'0.2\'">'':'<div style="width:100%;height:100%;background:linear-gradient(135deg,#0A4A5A,#0D6B80);display:flex;align-items:center;justify-content:center;font-size:3rem">'+_esc(h.data.emoji)+'</div>')
+        +(img?'<img src="'+_esc(img)+'" alt="'+_esc(h.data.title)+'" loading="lazy" style="width:100%;height:100%;object-fit:cover"'+(_esc(img).includes('supabase.co')?' crossorigin="anonymous"':'')+' onerror="this.onerror=null;this.style.opacity=\'0.2\'">'  :'<div style="width:100%;height:100%;background:linear-gradient(135deg,#0A4A5A,#0D6B80);display:flex;align-items:center;justify-content:center;font-size:3rem">'+_esc(h.data.emoji)+'</div>')
         +(selected?'<div style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--navy)">✓</div>':'')
         +'</div>'
         +'<div style="padding:16px">'

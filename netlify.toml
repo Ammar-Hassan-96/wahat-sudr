@@ -1,6 +1,7 @@
 [build]
   publish = "."
   functions = "netlify/functions"
+  edge_functions = "netlify/edge-functions"
 
 [functions]
   directory = "netlify/functions"
@@ -91,3 +92,7 @@
   for = "/"
   [headers.values]
     Cache-Control = "no-cache, must-revalidate"
+
+[[edge_functions]]
+  path = "/img-proxy"
+  function = "img-proxy"

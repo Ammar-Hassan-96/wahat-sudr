@@ -89,16 +89,38 @@ async function networkFirst(request) {
 
 // ── Cache-First: for images ──────────────────
 async function cacheFirstImages(request) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
   try {
+    // ✅ تجاهل أي request مش http/https (زي chrome-extension)
+    if (!request.url.startsWith('http')) {
+      return fetch(request);
+    }
+
+    // ✅ تأكد إنه request خاص بالصور فقط
+    if (request.destination !== 'image') {
+      return fetch(request);
+    }
+
+    // 🔎 شوف لو موجود في الكاش
+    const cached = await caches.match(request);
+    if (cached) return cached;
+
+    // 🌐 هات من الشبكة
     const response = await fetch(request);
+
+    // ✅ تحقق إن response صالح
     if (response && response.ok) {
       const cache = await caches.open(IMAGES_CACHE);
-      cache.put(request, response.clone());
+
+      // ✅ خزّن نسخة في الكاش
+      await cache.put(request, response.clone());
     }
+
     return response;
+
   } catch (e) {
+    console.warn('[SW] Image cache error:', e);
+
+    // ❌ fallback لو فشل
     return new Response('', { status: 404 });
   }
 }

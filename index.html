@@ -3565,14 +3565,22 @@ async function saveGalleryItem(){
     let file = window._pendingGalleryFile;
     showToast('⏳ جاري رفع الصورة...','info');
     try{
-      let ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+      let ext = file.name.split('.').pop().toLowerCase();
+      if(!ext || ext === file.name.toLowerCase()){
+        const mimeMap = {
+          'image/heic':'heic','image/heif':'heif',
+          'image/jpeg':'jpg','image/png':'png','image/webp':'webp',
+          'video/mp4':'mp4','video/quicktime':'mov','video/webm':'webm'
+        };
+        ext = mimeMap[file.type] || 'jpg';
+      }
       let filename = 'gallery-'+Date.now()+'.'+ext;
       let res = await fetch(SB_URL+'/storage/v1/object/place-images/'+filename,{
         method:'POST',
         headers:{
           'apikey': SB_KEY,
           'Authorization': 'Bearer '+SB_KEY,
-          'Content-Type': file.type||'image/jpeg',
+          'Content-Type': file.type || (filename.match(/\.(mp4|mov|webm|mpeg)$/i) ? 'video/mp4' : 'image/jpeg'),
           'x-upsert': 'true'
         },
         body: file
@@ -8325,7 +8333,18 @@ async function addPImgs(inp){
     let file=files[i];
     try{
       // رفع على Supabase Storage مباشرة
-      let ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+      // iPhone بيطلع HEIC/MOV — نحدد الامتداد من الـ MIME type لو مش واضح
+      let ext = file.name.split('.').pop().toLowerCase();
+      if(!ext || ext === file.name.toLowerCase()){
+        const mimeMap = {
+          'image/heic':'heic','image/heif':'heif',
+          'image/jpeg':'jpg','image/jpg':'jpg','image/png':'png',
+          'image/webp':'webp','image/gif':'gif',
+          'video/mp4':'mp4','video/quicktime':'mov',
+          'video/mov':'mov','video/mpeg':'mp4','video/webm':'webm'
+        };
+        ext = mimeMap[file.type] || 'jpg';
+      }
       let filename = _editPlaceKey+'-'+Date.now()+'-'+i+'.'+ext;
       let res = await fetch(SB_URL+'/storage/v1/object/place-images/'+filename,{
         method:'POST',

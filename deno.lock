@@ -1,69 +1,18 @@
-// ══════════════════════════════════════════════════════════
-//  Image Proxy — واحة سدر
-//  يجيب الصور من أي موقع عبر سيرفرنا عشان يتجنب الـ CORS
-//  وHotlink Protection على Android Chrome
-//  الاستخدام: /img-proxy?url=https://example.com/photo.jpg
-// ══════════════════════════════════════════════════════════
-
-export default async (req) => {
-  const reqUrl = new URL(req.url);
-  const imageUrl = reqUrl.searchParams.get('url');
-
-  // تحقق إن في URL
-  if (!imageUrl) {
-    return new Response('Missing url parameter', { status: 400 });
-  }
-
-  // تحقق إن الـ URL صحيح
-  let parsedUrl;
-  try {
-    parsedUrl = new URL(imageUrl);
-  } catch {
-    return new Response('Invalid URL', { status: 400 });
-  }
-
-  // فقط http/https
-  if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-    return new Response('Only http/https URLs allowed', { status: 400 });
-  }
-
-  try {
-    // جيب الصورة من الموقع الأصلي مع browser-like headers
-    const response = await fetch(imageUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': parsedUrl.origin + '/',
-        'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
-        'Accept-Language': 'ar,en;q=0.9',
-      },
-    });
-
-    if (!response.ok) {
-      return new Response('Image fetch failed: ' + response.status, { status: 502 });
+{
+  "version": "5",
+  "remote": {
+    "https://edge.netlify.com/": "fd941d61d88673d5f28aab283fb86fcc50f08a3bc80ee5470498fcfa88c65cfb",
+    "https://edge.netlify.com/bootstrap/config.ts": "6a2ce0e544e15e8f8883a5c18da5948e37fd0f2619f68cb31f3af53c51817025",
+    "https://edge.netlify.com/bootstrap/context.ts": "e97240232121e2f369f6546ce961490f34d961ea1ea54be3ff09633e3f08373f",
+    "https://edge.netlify.com/bootstrap/cookie.ts": "8b0baae708989ca183c6f3b4ab3d029e6abcbc2e43f93edeb0ff447b3bbc3a05",
+    "https://edge.netlify.com/bootstrap/edge_function.ts": "b8253e86aa83c67341f5cfedeba5049d77fbf84dcab7eceff7566b7728ae9b39",
+    "https://edge.netlify.com/bootstrap/globals/types.ts": "eaa6148ded3121d8dee62dd91c86e7fe76601df0f3ca8d7962243a30f4c8935f"
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@netlify/blobs@^10.7.4"
+      ]
     }
-
-    const contentType = response.headers.get('content-type') || 'image/jpeg';
-
-    // تأكد إنه فعلاً image
-    if (!contentType.startsWith('image/') && !contentType.startsWith('video/')) {
-      return new Response('Not an image', { status: 415 });
-    }
-
-    const imageData = await response.arrayBuffer();
-
-    return new Response(imageData, {
-      status: 200,
-      headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=86400, stale-while-revalidate=3600',
-        'X-Proxy': 'wahat-sudr-img-proxy',
-      },
-    });
-  } catch (err) {
-    return new Response('Proxy error: ' + err.message, { status: 502 });
   }
-};
-
-export const config = {
-  path: '/img-proxy',
-};
+}

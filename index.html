@@ -3188,64 +3188,93 @@ try{
 
 // ========== LEAFLET MAP ==========
 (function(){
-  function doInitMap(){
-    if(typeof L === 'undefined'){ console.warn('Leaflet not loaded'); return; }
-    let container = document.getElementById('leafletMap');
-    if(!container || container._leaflet_id) return; // already initialized
-    try{
-    const map = L.map('leafletMap', { center:[29.5993,32.7084], zoom:13, zoomControl:true });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      attribution:'© OpenStreetMap',maxZoom:18
-    }).addTo(map);
+  // حفظ الـ map instance عشان _rebuildMap يقدر يوصله
+  window._leafletMapInstance = null;
 
-    const places = [
-      {lat:29.5993,lng:32.7084,name:'رأس سدر — مركز المدينة',icon:'🌊',color:'#0A7E8C'},
-      {lat:29.6080,lng:32.6980,name:'شاطئ رأس سدر الذهبي',icon:'🏖️',color:'#007A9A'},
-      {lat:29.6120,lng:32.6930,name:'منطقة كايت سيرف',icon:'🪁',color:'#005A7A'},
-      {lat:29.5850,lng:32.7180,name:'العيون الكبريتية الكبرى',icon:'♨️',color:'#2E7D32'},
-      {lat:29.5870,lng:32.7160,name:'عين الصفا الكبريتية',icon:'💧',color:'#1565C0'},
-      {lat:29.6041,lng:32.6946,name:'منتجع القمر رأس سدر',icon:'🌙',color:'#6A1B9A'},
-      {lat:29.6060,lng:32.6960,name:'قرية النخيل السياحية',icon:'🌴',color:'#2E7D32'},
-      {lat:29.5980,lng:32.7100,name:'ريزورت المرجان',icon:'🪸',color:'#C62828'},
-      {lat:29.6000,lng:32.7060,name:'فندق دولفين',icon:'🐬',color:'#00838F'},
-      {lat:29.5970,lng:32.7080,name:'فندق سيسل',icon:'🏰',color:'#4527A0'},
-      {lat:29.5997,lng:32.7090,name:'مسجد بلال الكبير',icon:'🕌',color:'#E65100'},
-      {lat:29.6010,lng:32.7020,name:'مركز الغوص البحري',icon:'🤿',color:'#00695C'},
-      {lat:29.5940,lng:32.7150,name:'مطعم المأكولات البحرية',icon:'🦞',color:'#BF360C'},
-      {lat:29.5960,lng:32.7120,name:'حمامات الطين السيناوي',icon:'🪨',color:'#4E342E'},
-      {lat:29.6200,lng:32.6850,name:'سفاري الصحراء والجبال',icon:'🏜️',color:'#827717'},
-      {lat:29.6050,lng:32.6980,name:'رحلات صيد الأسماك — الميناء',icon:'🎣',color:'#1A237E'},
-    ];
-
-    places.forEach(p=>{
-      const icon = L.divIcon({
-        html:`<div style="background:${p.color};width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 4px 12px rgba(0,0,0,0.4);border:2px solid rgba(255,255,255,0.8)">${p.icon}</div>`,
-        className:'',iconAnchor:[18,18]
+  function _buildMapMarkers(map, points){
+    points.forEach(function(p){
+      var icon = L.divIcon({
+        html:'<div style="background:'+p.color+';width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;box-shadow:0 4px 15px rgba(0,0,0,0.45);border:2.5px solid rgba(255,255,255,0.9)">'+p.icon+'</div>',
+        className:'',iconAnchor:[19,19],popupAnchor:[0,-20]
       });
-      L.marker([p.lat,p.lng],{icon}).addTo(map)
-        .bindPopup(`<div style="font-family:Cairo,sans-serif;text-align:right;direction:rtl;font-weight:600;font-size:0.9rem;padding:4px 2px">${_esc(p.icon)} ${_esc(p.name)}</div>`);
+      L.marker([p.lat,p.lng],{icon:icon}).addTo(map)
+        .bindPopup('<div style="font-family:Cairo,sans-serif;text-align:right;direction:rtl;font-weight:700;font-size:0.9rem;padding:6px 4px;min-width:140px">'+p.icon+' '+_esc(p.name)+'</div>');
     });
+  }
 
-    // Dark tile overlay for dark theme
-    const isDark = document.documentElement.getAttribute('data-theme')==='dark';
-    if(isDark){
-      document.querySelector('#leafletMap .leaflet-tile-pane').style.filter='invert(85%) hue-rotate(180deg) brightness(0.9)';
+  // Carto tile layers — Voyager للـ light، Dark Matter للـ dark
+  var _cartoDark  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+  var _cartoLight = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+  var _tileAttrib = '© <a href="https://openstreetmap.org">OpenStreetMap</a> © <a href="https://carto.com">CARTO</a>';
+  var _currentTileLayer = null;
+
+  function _applyMapTheme(map){
+    if(!map || typeof L === 'undefined') return;
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var newUrl  = isDark ? _cartoDark : _cartoLight;
+    // لو نفس الـ theme — مش محتاج تغيير
+    if(_currentTileLayer && _currentTileLayer._url === newUrl) return;
+    // شيل الـ tile القديم وحط الجديد
+    if(_currentTileLayer) map.removeLayer(_currentTileLayer);
+    _currentTileLayer = L.tileLayer(newUrl, {
+      attribution: _tileAttrib,
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(map);
+    // مسح الـ filter لو كان متطبق من قبل
+    var tp = document.querySelector('#leafletMap .leaflet-tile-pane');
+    if(tp) tp.style.filter = 'none';
+  }
+
+  function doInitMap(){
+    if(typeof L === 'undefined'){
+      // Leaflet لسه ما حملش — استنى وجرب تاني
+      setTimeout(doInitMap, 200);
+      return;
     }
-    document.getElementById('themeToggle').addEventListener('click',()=>{
-      setTimeout(()=>{
-        const d = document.documentElement.getAttribute('data-theme')==='dark';
-        const tp = document.querySelector('#leafletMap .leaflet-tile-pane');
-        if(tp) tp.style.filter = d ? 'invert(85%) hue-rotate(180deg) brightness(0.9)' : 'none';
-      },100);
-    });
-    map.invalidateSize();
-  }catch(e){ console.warn('Map error',e); }
+    var container = document.getElementById('leafletMap');
+    if(!container || container._leaflet_id) return;
+    try{
+      var map = L.map('leafletMap', {
+        center:[29.5993,32.7084], zoom:13,
+        zoomControl:true,
+        attributionControl:true
+      });
+
+      // Carto tile — بيتحدد حسب الـ theme في _applyMapTheme
+      var _initTileUrl = (document.documentElement.getAttribute('data-theme')==='dark')
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+      _currentTileLayer = L.tileLayer(_initTileUrl,{
+        attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a> © <a href="https://carto.com">CARTO</a>',
+        subdomains:'abcd', maxZoom:19
+      }).addTo(map);
+
+      // حفظ الـ instance للـ rebuild
+      window._leafletMapInstance = map;
+
+      // استخدم _mapPointsData لو موجودة، غير كده الـ defaults
+      var pts = (typeof _mapPointsData !== 'undefined' && Array.isArray(_mapPointsData) && _mapPointsData.length)
+        ? _mapPointsData
+        : (typeof _DEFAULT_MAP_POINTS !== 'undefined' ? _DEFAULT_MAP_POINTS : []);
+
+      _buildMapMarkers(map, pts);
+      _applyMapTheme(map);
+
+      // تحديث الـ theme لما يتغير
+      var themeBtn = document.getElementById('themeToggle');
+      if(themeBtn) themeBtn.addEventListener('click', function(){
+        setTimeout(function(){ _applyMapTheme(map); }, 150);
+      });
+
+      setTimeout(function(){ map.invalidateSize(); }, 300);
+    }catch(e){ console.warn('[Map] init error:', e); }
   }
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', doInitMap);
-  } else {
-    doInitMap();
-  }
+
+  // شغّل بعد كل حاجة تحمّل — مش على DOMContentLoaded عشان Leaflet defer
+  window.addEventListener('load', function(){ setTimeout(doInitMap, 100); });
+  // fallback لو load اتأخر
+  setTimeout(doInitMap, 1500);
 })();
 
 // ========== COUNTER ANIMATION ==========
@@ -5298,6 +5327,8 @@ function applyDataToSite(placesData, infoData){
         applyDataToSite(places, info);
         renderPlacesGrid();
         if(typeof renderCompareGrid==='function') setTimeout(renderCompareGrid, 100);
+        // تحديث الخريطة لو في map_points جديدة
+        if(typeof _rebuildMap==='function') setTimeout(_rebuildMap, 200);
         console.log('[Init] Supabase data applied' + (changed ? ' (updated)' : ' (first load)'));
       } else {
         console.log('[Init] Supabase confirmed — no changes');
@@ -7626,25 +7657,60 @@ setTimeout(initDeepLinks, 500);
 // ╚═══════════════════════════════════════════════════════════╝
 let _currentLang = localStorage.getItem('ws_lang') || 'ar';
 
-// Rewrite setLang to use data-en/data-ar
+// setLang — يستخدم Google Translate API مباشرة بدون reload
 window.setLang = function(lang){
-  let al = document.getElementById('adminLayer');
-  // لو الأدمن مفتوح — طبّق بدون reload
-  if(al && al.style.display !== 'none'){
-    return;
-  }
-  // الصفحة الرئيسية — استخدم Google Translate cookies + reload
+  // لو الأدمن مفتوح — تجاهل
+  var al = document.getElementById('adminLayer');
+  if(al && al.style.display !== 'none') return;
+
+  var btnAr = document.getElementById('btnAr');
+  var btnEn = document.getElementById('btnEn');
+
   if(lang === 'en'){
-    document.cookie = 'googtrans=/ar/en; path=/; domain=' + location.hostname;
-    document.cookie = 'googtrans=/ar/en; path=/';
     localStorage.setItem('ws_lang','en');
+    _currentLang = 'en';
+    if(btnAr) btnAr.classList.remove('active');
+    if(btnEn) btnEn.classList.add('active');
+
+    // حاول استخدام Google Translate بدون reload
+    var tried = false;
+    try{
+      var sel = document.querySelector('.goog-te-combo');
+      if(sel){
+        sel.value = 'en';
+        sel.dispatchEvent(new Event('change'));
+        tried = true;
+      }
+    }catch(e){}
+
+    // لو Google Translate مش شغّال — استخدم cookies + reload
+    if(!tried){
+      document.cookie = 'googtrans=/ar/en; path=/; domain=' + location.hostname;
+      document.cookie = 'googtrans=/ar/en; path=/';
+      location.reload();
+    }
+
   } else {
-    let exp = 'expires=Thu, 01 Jan 1970 00:00:00 UTC';
+    localStorage.setItem('ws_lang','ar');
+    _currentLang = 'ar';
+    if(btnAr) btnAr.classList.add('active');
+    if(btnEn) btnEn.classList.remove('active');
+
+    try{
+      var sel2 = document.querySelector('.goog-te-combo');
+      if(sel2){
+        sel2.value = 'ar';
+        sel2.dispatchEvent(new Event('change'));
+        return; // نجح بدون reload
+      }
+    }catch(e){}
+
+    // fallback
+    var exp = 'expires=Thu, 01 Jan 1970 00:00:00 UTC';
     document.cookie = 'googtrans=; ' + exp + '; path=/; domain=' + location.hostname;
     document.cookie = 'googtrans=; ' + exp + '; path=/';
-    localStorage.setItem('ws_lang','ar');
+    location.reload();
   }
-  location.reload();
 };
 
 // Apply saved lang on load — handled via googtrans cookie on page load
@@ -9864,29 +9930,16 @@ async function _adminDelMapPoint(i){
 
 function _rebuildMap(){
   try{
-    let mapEl=document.getElementById('leafletMap');if(!mapEl||!mapEl._leaflet_id)return;
-    // Access the Leaflet map instance
-    let map;
-    document.querySelectorAll('.leaflet-marker-icon').forEach(function(m){m.remove();});
-    document.querySelectorAll('.leaflet-popup').forEach(function(p){p.remove();});
-    // Re-add markers using existing L map
-    if(typeof L==='undefined')return;
-    // Get map instance from element
-    for(let k in mapEl){if(mapEl[k] instanceof L.Map){map=mapEl[k];break;}}
-    if(!map){
-      // Try the _leaflet_id approach
-      let id=mapEl._leaflet_id;
-      if(L.Map && L.Map._instances) map=L.Map._instances[id];
-    }
+    if(typeof L === 'undefined') return;
+    var map = window._leafletMapInstance;
     if(!map) return;
-    // Remove existing markers
-    map.eachLayer(function(layer){if(layer instanceof L.Marker) map.removeLayer(layer);});
-    // Add new markers
-    _mapPointsData.forEach(function(p){
-      let icon=L.divIcon({html:'<div style="background:'+_esc(p.color)+';width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 4px 12px rgba(0,0,0,0.4);border:2px solid rgba(255,255,255,0.8)">'+_esc(p.icon)+'</div>',className:'',iconAnchor:[18,18]});
-      L.marker([p.lat,p.lng],{icon:icon}).addTo(map).bindPopup('<div style="font-family:Cairo,sans-serif;text-align:right;direction:rtl;font-weight:600;font-size:0.9rem;padding:4px 2px">'+_esc(p.icon)+' '+_esc(p.name)+'</div>');
-    });
-  }catch(e){console.warn('Map rebuild:',e);}
+    // مسح الـ markers الموجودة
+    map.eachLayer(function(layer){ if(layer instanceof L.Marker) map.removeLayer(layer); });
+    // إضافة الـ markers الجديدة
+    var pts = (Array.isArray(_mapPointsData) && _mapPointsData.length) ? _mapPointsData : [];
+    if(typeof _buildMapMarkers === 'function') _buildMapMarkers(map, pts);
+    setTimeout(function(){ map.invalidateSize(); }, 100);
+  }catch(e){ console.warn('[Map] rebuild error:', e); }
 }
 
 // ═══════════════════════════════════════════

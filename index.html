@@ -7261,8 +7261,37 @@ async function manualSetPoints(){
 async function requestNotifPermission(){
   if(!('Notification' in window)) return;
   const perm = await Notification.requestPermission();
-  if(perm==='granted') localStorage.setItem('ws_notif','1');
+  if(perm==='granted'){
+    localStorage.setItem('ws_notif','1');
+    // اشترك في الـ SW Push بعد منح الإذن
+    await subscribeWebPush();
+  }
 }
+
+// ── SW Push Subscription ──────────────────────────────────
+async function subscribeWebPush(){
+  try{
+    if(!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    const reg = await navigator.serviceWorker.ready;
+    const existing = await reg.pushManager.getSubscription();
+    if(existing){ console.log('[Push] Already subscribed'); return; }
+    // اشترك — بدون VAPID key (basic push)
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: null
+    }).catch(()=>null);
+    if(sub) console.log('[Push] Subscribed successfully');
+  }catch(e){ console.warn('[Push] Subscribe failed:', e.message||e); }
+}
+
+// ── تحقق من إذن الإشعارات عند الفتح ──────────────────────
+window.addEventListener('load', function(){
+  // لو الإذن موجود بالفعل — تأكد من الـ SW subscription
+  if(typeof Notification !== 'undefined' && Notification.permission === 'granted'){
+    localStorage.setItem('ws_notif','1');
+    subscribeWebPush();
+  }
+});
 
 function sendAdminNotif(title, body){
   if(Notification.permission!=='granted') return;
@@ -7927,6 +7956,7 @@ window.aTab = function(name){
 // ═══ Service Worker — auto-update + force refresh ═══
 if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){
   window.addEventListener('load', function(){
+    // Offline page: /offline.html — shown by SW when network fails
     navigator.serviceWorker.register('/sw.js', {scope:'/'})
       .then(function(reg){
         console.log('[SW] Registered v2026-04-05-v14');

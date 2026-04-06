@@ -1,9 +1,9 @@
 // ══════════════════════════════════════════════
 //  Service Worker — واحة سدر السياحية
-//  v2026-04-05-v12 (Network-First + Reliable Offline)
+//  v2026-04-06-v15 (Network-First + Reliable Offline)
 // ══════════════════════════════════════════════
 
-const CACHE_VERSION = 'ws-v2026-04-05-v14';
+const CACHE_VERSION = 'ws-v2026-04-06-v15';
 const STATIC_CACHE  = `${CACHE_VERSION}-static`;
 const IMAGES_CACHE  = `${CACHE_VERSION}-images`;
 const API_CACHE     = `${CACHE_VERSION}-api`;

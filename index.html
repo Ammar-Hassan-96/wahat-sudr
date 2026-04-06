@@ -3876,63 +3876,28 @@ function toggleFaq(btn){
       <button class="atab" onclick="aTab('report')" id="tab-report">📊 تقرير PDF</button>
       <button class="atab" onclick="aTab('subscribers')" id="tab-subscribers">📧 المشتركين</button>
       <button class="atab" onclick="aTab('blog')" id="tab-blog">📰 المقالات</button>
-      <button class="atab" onclick="aTab('activity-log')" id="tab-activity-log">📋 سجل النشاط</button>
       <button class="atab" onclick="aTab('maintenance')" id="tab-maintenance" style="color:#f87171;border-color:rgba(239,68,68,0.3)">🛡️ الصيانة</button>
     </div>
     <!-- Supabase status bar -->
     <div id="sbStatusBar" style="display:none;margin:16px 24px 0;border:1px solid;border-radius:12px;padding:10px 16px;font-size:0.82rem;color:rgba(255,255,255,0.8)"></div>
-
-    <!-- Admin Search Bar -->
-    <div id="adminSearchBar" style="margin:12px 24px 0;display:none">
-      <div style="position:relative">
-        <input type="text" id="adminSearchInput"
-          placeholder="🔍 ابحث في الأماكن والفنادق..."
-          oninput="adminGlobalSearch(this.value)"
-          style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:12px;padding:10px 16px 10px 44px;color:#fff;font-family:'Cairo',sans-serif;font-size:0.88rem;outline:none;box-sizing:border-box;direction:rtl">
-        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none">🔍</span>
-        <button onclick="adminSearchInput.value='';adminGlobalSearch('')"
-          id="adminSearchClear" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:1rem">✕</button>
-      </div>
-      <div id="adminSearchResults" style="display:none;margin-top:8px;background:rgba(13,27,46,0.98);border:1px solid rgba(201,168,76,0.2);border-radius:12px;max-height:300px;overflow-y:auto"></div>
-    </div>
 
     <!-- Panels -->
     <div style="padding:24px;max-width:1100px;margin:0 auto">
 
       <!-- PLACES panel -->
       <div id="panel-places" class="apanel">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
           <h3 style="color:#C9A84C;font-size:1.1rem;font-weight:800">إدارة الأماكن السياحية</h3>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button onclick="adminExportPlacesExcel()" style="background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);color:#4ade80;border-radius:10px;padding:8px 14px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.82rem;font-weight:700">📊 تصدير Excel</button>
-            <button onclick="adminAddPlace()" style="background:rgba(10,126,140,0.2);border:1px solid rgba(10,126,140,0.4);color:#14B8CC;border-radius:10px;padding:8px 16px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.85rem;font-weight:700">+ إضافة مكان جديد</button>
-          </div>
-        </div>
-        <!-- Bulk Actions Bar -->
-        <div id="bulkBarPlaces" style="display:none;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:12px;padding:10px 14px;margin-bottom:12px;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-          <span id="bulkCountPlaces" style="color:#E8C97A;font-size:0.85rem;font-weight:700">0 محدد</span>
-          <div style="display:flex;gap:8px">
-            <button onclick="adminBulkSelectAll('places')" style="background:rgba(20,184,204,0.12);border:1px solid rgba(20,184,204,0.3);color:#14B8CC;border-radius:8px;padding:5px 12px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.78rem">تحديد الكل</button>
-            <button onclick="adminBulkDelete('places')" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:8px;padding:5px 12px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.78rem">🗑️ حذف المحدد</button>
-            <button onclick="adminBulkClear('places')" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);border-radius:8px;padding:5px 12px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.78rem">✕ إلغاء</button>
-          </div>
+          <button onclick="adminAddPlace()" style="background:rgba(10,126,140,0.2);border:1px solid rgba(10,126,140,0.4);color:#14B8CC;border-radius:10px;padding:8px 16px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.85rem;font-weight:700">+ إضافة مكان جديد</button>
         </div>
         <div id="adminPlacesList"></div>
       </div>
 
       <!-- HOTELS panel -->
       <div id="panel-hotels" class="apanel" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
           <h3 style="color:#C9A84C;font-size:1.1rem;font-weight:800">إدارة الفنادق والمنتجعات</h3>
           <button onclick="adminAddHotel()" style="background:rgba(10,126,140,0.2);border:1px solid rgba(10,126,140,0.4);color:#14B8CC;border-radius:10px;padding:8px 16px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.85rem;font-weight:700">🏨 إضافة فندق جديد</button>
-        </div>
-        <div id="bulkBarHotels" style="display:none;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:12px;padding:10px 14px;margin-bottom:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-          <span id="bulkCountHotels" style="color:#E8C97A;font-size:0.85rem;font-weight:700">0 محدد</span>
-          <div style="display:flex;gap:8px">
-            <button onclick="adminBulkSelectAll('hotels')" style="background:rgba(20,184,204,0.12);border:1px solid rgba(20,184,204,0.3);color:#14B8CC;border-radius:8px;padding:5px 12px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.78rem">تحديد الكل</button>
-            <button onclick="adminBulkDelete('hotels')" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:8px;padding:5px 12px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.78rem">🗑️ حذف المحدد</button>
-            <button onclick="adminBulkClear('hotels')" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);border-radius:8px;padding:5px 12px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.78rem">✕ إلغاء</button>
-          </div>
         </div>
         <div id="adminHotelsList"></div>
       </div>
@@ -4162,17 +4127,6 @@ function toggleFaq(btn){
           </div>
         </div>
 
-        <!-- Place Stats Section -->
-        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:22px;margin-bottom:20px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
-            <h4 style="color:rgba(255,255,255,0.7);font-size:0.88rem;margin:0">🏆 أكثر الأماكن تفاعلاً</h4>
-            <button onclick="adminLoadPlaceStats()" style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);color:#E8C97A;border-radius:8px;padding:4px 12px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.75rem">🔄 تحديث</button>
-          </div>
-          <div id="placeStatsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
-            <div style="text-align:center;padding:20px;color:rgba(255,255,255,0.25);font-size:0.82rem;grid-column:1/-1">اضغط تحديث لعرض إحصائيات الأماكن</div>
-          </div>
-        </div>
-
         <!-- Top Places -->
         <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:22px;margin-bottom:20px">
           <h4 style="color:rgba(255,255,255,0.7);font-size:0.88rem;margin-bottom:14px">🏆 أكثر الأماكن طلباً</h4>
@@ -4379,21 +4333,6 @@ function toggleFaq(btn){
         <div style="margin-top:24px;padding:14px 18px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.15);border-radius:12px">
           <p style="color:rgba(255,255,255,0.5);font-size:0.78rem;margin:0">⚠️ الإعدادات تُحفظ في متصفح الأدمن — عند نقل الملف لسيرفر يُنصح بحفظها في Supabase</p>
         </div>
-
-        <!-- Push Notification Section -->
-        <div style="margin-top:20px;background:rgba(20,184,204,0.06);border:1px solid rgba(20,184,204,0.2);border-radius:16px;padding:20px">
-          <h4 style="color:#14B8CC;font-size:0.95rem;font-weight:800;margin:0 0 6px">🔔 إرسال إشعار للزوار</h4>
-          <p style="color:rgba(255,255,255,0.35);font-size:0.78rem;margin:0 0 16px">يصل للزوار اللي قبلوا الإشعارات حتى لو مش فاتحين الموقع</p>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <input type="text" id="pushTitle" placeholder="عنوان الإشعار — مثال: عرض خاص!" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:0.85rem;outline:none">
-            <textarea id="pushBody" rows="2" placeholder="نص الإشعار — مثال: خصم 20% على جميع الحجوزات لمدة محدودة!" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:0.85rem;resize:none;outline:none"></textarea>
-            <div style="display:flex;gap:8px">
-              <input type="text" id="pushUrl" placeholder="رابط (اختياري) — مثال: /#offers" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:0.82rem;outline:none">
-              <button onclick="adminSendPushNotif()" style="background:linear-gradient(135deg,#0A7E8C,#14B8CC);color:#fff;border:none;border-radius:10px;padding:10px 20px;cursor:pointer;font-family:'Cairo',sans-serif;font-weight:700;font-size:0.85rem;white-space:nowrap">📤 إرسال</button>
-            </div>
-            <div id="pushStatus" style="display:none;font-size:0.8rem;padding:8px 12px;border-radius:8px"></div>
-          </div>
-        </div>
       </div>
 
       <!-- ═══ TIPS ADMIN ═══ -->
@@ -4593,31 +4532,6 @@ function toggleFaq(btn){
         </div>
         <div id="blogAdminList" style="display:flex;flex-direction:column;gap:10px">
           <p style="color:var(--text-muted);text-align:center;padding:20px">⏳ جاري التحميل...</p>
-        </div>
-      </div>
-
-<!-- ACTIVITY LOG panel -->
-      <div id="panel-activity-log" class="apanel" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-          <div>
-            <h3 style="color:#C9A84C;font-size:1.1rem;font-weight:800;margin:0">📋 سجل النشاط</h3>
-            <p style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin:4px 0 0">كل العمليات المنجزة في لوحة التحكم</p>
-          </div>
-          <div style="display:flex;gap:8px">
-            <button onclick="adminLoadActivityLog()" style="background:rgba(20,184,204,0.12);border:1px solid rgba(20,184,204,0.3);color:#14B8CC;border-radius:10px;padding:7px 14px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.82rem;font-weight:700">🔄 تحديث</button>
-            <button onclick="adminClearActivityLog()" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#f87171;border-radius:10px;padding:7px 14px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:0.82rem">🗑️ مسح السجل</button>
-          </div>
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
-          <button onclick="adminFilterLog('all')" id="log-filter-all" class="filter-btn active" style="padding:5px 14px;font-size:0.78rem">الكل</button>
-          <button onclick="adminFilterLog('add')" id="log-filter-add" class="filter-btn" style="padding:5px 14px;font-size:0.78rem">➕ إضافة</button>
-          <button onclick="adminFilterLog('edit')" id="log-filter-edit" class="filter-btn" style="padding:5px 14px;font-size:0.78rem">✏️ تعديل</button>
-          <button onclick="adminFilterLog('delete')" id="log-filter-delete" class="filter-btn" style="padding:5px 14px;font-size:0.78rem">🗑️ حذف</button>
-          <button onclick="adminFilterLog('login')" id="log-filter-login" class="filter-btn" style="padding:5px 14px;font-size:0.78rem">🔑 دخول</button>
-          <button onclick="adminFilterLog('booking')" id="log-filter-booking" class="filter-btn" style="padding:5px 14px;font-size:0.78rem">📦 حجوزات</button>
-        </div>
-        <div id="activityLogList" style="display:flex;flex-direction:column;gap:8px">
-          <div style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);font-size:0.9rem">اضغط تحديث لعرض السجل</div>
         </div>
       </div>
 
@@ -5303,8 +5217,6 @@ async function adminLogin(){
     let secWarn = document.getElementById('adminSecWarn');
     if(secWarn) secWarn.style.display = isDefault ? 'flex' : 'none';
     adminLoadDash();
-    adminLogActivity('login','تسجيل دخول للوحة التحكم');
-    _adminShowSearch();
   } else {
     document.getElementById('adminLoginErr').style.display = 'block';
     setTimeout(()=>document.getElementById('adminLoginErr').style.display='none', 3000);
@@ -5328,15 +5240,12 @@ function aTab(name){
   document.querySelectorAll('.apanel').forEach(p=>p.style.display='none');
   document.getElementById('tab-'+name).classList.add('active');
   document.getElementById('panel-'+name).style.display = 'block';
-  if(name==='analytics')      loadAnalytics();
-  if(name==='subscribers')    loadSubs();
-  if(name==='reviews')        loadAdminReviews();
-  if(name==='bookings')       loadAdminBookings();
-  if(name==='loyalty-admin')  loadLoyaltyAdmin();
-  if(name==='gallery-admin')  loadGalleryAdmin();
-  if(name==='activity-log')   adminLoadActivityLog();
-  if(name==='features')       loadFeatSettings();
-  if(name==='report')         typeof loadAdminReport==='function' && loadAdminReport();
+  if(name==='analytics')     loadAnalytics();
+    if(name==='subscribers')   loadSubs();
+  if(name==='reviews')       loadAdminReviews();
+  if(name==='bookings')      loadAdminBookings();
+  if(name==='loyalty-admin') loadLoyaltyAdmin();
+  if(name==='gallery-admin') loadGalleryAdmin();
 }
 
 // _adminCache mirrors modalData — always kept in sync
@@ -5627,7 +5536,6 @@ function renderAdminPlaces(){
     <div class="admin-place-card" id="acard-${_esc(key)}">
       <div class="admin-place-header">
         <div style="display:flex;align-items:center;gap:10px">
-          <input type="checkbox" class="bulk-checkbox" id="bulk-cb-${_esc(key)}" onchange="adminToggleBulk('places','${_esc(key)}',this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:#C9A84C">
           <span style="font-size:1.5rem">${_esc(place.emoji)}</span>
           <div>
             <div class="admin-place-title" contenteditable="true" onblur="adminUpdateField('${_esc(key)}','title',this.textContent)">${_esc(place.title)}</div>
@@ -5695,7 +5603,6 @@ function renderAdminHotels(){
     <div class="admin-place-card" id="acard-${_esc(key)}">
       <div class="admin-place-header">
         <div style="display:flex;align-items:center;gap:10px">
-          <input type="checkbox" class="bulk-checkbox" id="bulk-cb-${_esc(key)}" onchange="adminToggleBulk('places','${_esc(key)}',this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:#C9A84C">
           <span style="font-size:1.5rem">${_esc(place.emoji)}</span>
           <div>
             <div class="admin-place-title" contenteditable="true" onblur="adminUpdateField('${_esc(key)}','title',this.textContent)">${_esc(place.title)}</div>
@@ -5816,13 +5723,11 @@ async function adminAddImgFromUrl(key){
   showToast('✅ تمت إضافة الصورة','success');
 }
 async function adminDeletePlace(key){
-  const _d0=getAdminData(); const _t0=_d0[key]?_d0[key].title:key;
   if(!confirm('هل أنت متأكد من حذف هذا المكان؟')) return;
   const data = getAdminData();
   delete data[key];
   await saveAdminData(data);
   renderAdminPlaces();
-  adminLogActivity('delete','حذف مكان: '+_t0);
 }
 async function adminAddPlace(){
   const key = 'place_'+Date.now();
@@ -6043,7 +5948,6 @@ async function adminSaveAll(){
     n.textContent = '⚠️ تم الحفظ محليًا فقط — تأكد من اتصال Supabase';
     n.style.color = '#f87171';
   }
-  adminLogActivity('save','حفظ التغييرات على Supabase');
   setTimeout(()=>n.style.display='none', 3000);
 }
 
@@ -6412,35 +6316,12 @@ async function updatePendingBadge(){
     const pending = bookings.filter(b=>b.status==='pending').length;
     const badge = document.getElementById('pendingBadge');
     if(!badge) return;
-    const prevCount = parseInt(badge.dataset.prev||'0');
     if(pending > 0){ badge.textContent=pending; badge.style.display='inline'; }
     else { badge.style.display='none'; }
-    // صوت + toast لو جه حجز جديد
-    if(pending > prevCount && prevCount >= 0 && document.getElementById('adminDash')?.style.display!=='none'){
-      _adminPlayBookingSound();
-      if(typeof showToast==='function') showToast('📦 حجز جديد وصل! اضغط على تاب الحجوزات','warning');
-      // flash على التاب
-      const tab = document.getElementById('tab-bookings');
-      if(tab){ tab.style.background='rgba(239,68,68,0.3)'; setTimeout(()=>tab.style.background='',3000); }
-    }
-    badge.dataset.prev = pending;
   }catch(e){}
 }
-function _adminPlayBookingSound(){
-  try{
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    [523,659,784].forEach((freq,i)=>{
-      const osc=ctx.createOscillator(); const gain=ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.value=freq; gain.gain.value=0.3;
-      osc.start(ctx.currentTime+i*0.15);
-      osc.stop(ctx.currentTime+i*0.15+0.12);
-    });
-  }catch(e){}
-}
-// Check on admin load + كل 60 ثانية
+// Check on admin load
 window.addEventListener('load', ()=>setTimeout(updatePendingBadge, 3000));
-setInterval(()=>{ if(document.getElementById('adminDash')?.style.display!=='none') updatePendingBadge(); }, 60000);
 
 async function loadAdminBookings(){
   const container = document.getElementById('adminBookingsList');
@@ -8087,7 +7968,8 @@ if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){
           if(newSW){
             newSW.addEventListener('statechange', function(){
               if(newSW.state === 'activated'){
-                // SW updated — silent, SW_UPDATED message handles reload
+                // New version active — show update toast
+                if(typeof showToast==='function') showToast('\u2728 \u062a\u0645 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0645\u0648\u0642\u0639 — \u0627\u0636\u063a\u0637 \u0647\u0646\u0627 \u0644\u0644\u062a\u062d\u062f\u064a\u062b','info');
               }
             });
           }
@@ -8103,8 +7985,10 @@ if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){
       const now = Date.now();
       if(now - lastReload < 30000) return;
       sessionStorage.setItem('_sw_reload_ts', String(now));
-      // reload تلقائي هادئ بدون toast — أفضل UX
-      window.location.reload();
+      // أظهر toast للمستخدم بدل الـ reload التلقائي المباشر
+      if(typeof showToast === 'function'){
+        showToast('✨ يوجد تحديث — اضغط لتحديث الصفحة', 'info');
+      }
     }
   });
 }
@@ -8747,293 +8631,6 @@ async function adminReorderImg(key, targetIdx){
   else renderAdminPlaces();
   showToast('✅ تم تغيير الترتيب','success');
 }
-
-
-// ══════════════════════════════════════════════════════════════
-// ██  NEW ADMIN FEATURES — إضافات لوحة التحكم المتطورة  ██
-// ══════════════════════════════════════════════════════════════
-
-// ── 1. ADMIN SEARCH ─────────────────────────────────────────
-function adminGlobalSearch(q){
-  var clear = document.getElementById('adminSearchClear');
-  var results = document.getElementById('adminSearchResults');
-  if(!clear||!results) return;
-  clear.style.display = q ? 'flex' : 'none';
-  if(!q || q.length < 2){ results.style.display='none'; return; }
-  var data = getAdminData();
-  var matches = [];
-  Object.entries(data).forEach(function(e){
-    var key=e[0], p=e[1];
-    var t=(p.title||'').toLowerCase();
-    var d=(p.desc||'').toLowerCase();
-    if(t.includes(q.toLowerCase()) || d.includes(q.toLowerCase())){
-      matches.push({key:key, place:p});
-    }
-  });
-  if(!matches.length){
-    results.innerHTML='<div style="padding:16px;color:rgba(255,255,255,0.3);text-align:center;font-size:0.85rem">لا توجد نتائج</div>';
-    results.style.display='block'; return;
-  }
-  results.innerHTML = matches.slice(0,8).map(function(m){
-    var img = m.place.images && m.place.images[0] ? m.place.images[0] : '';
-    var tab = (m.place.bg==='bg-hotel') ? 'hotels' : 'places';
-    return '<div onclick="adminSearchGo(''+_esc(m.key)+'',''+tab+'')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">'+
-      (img ? '<img src="'+_esc(_proxyImgUrl(img))+'" style="width:40px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">' : '<div style="width:40px;height:40px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">'+_esc(m.place.emoji)+'</div>')+
-      '<div style="flex:1;min-width:0"><div style="color:#fff;font-size:0.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+_esc(m.place.title)+'</div><div style="color:rgba(255,255,255,0.35);font-size:0.72rem">'+_esc(m.place.bg||'')+'</div></div>'+
-      '</div>';
-  }).join('');
-  results.style.display='block';
-}
-function adminSearchGo(key, tab){
-  var input=document.getElementById('adminSearchInput');
-  var results=document.getElementById('adminSearchResults');
-  if(input) input.value='';
-  if(results) results.style.display='none';
-  aTab(tab);
-  setTimeout(function(){
-    var el=document.getElementById('acard-'+key);
-    if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.outline='2px solid #C9A84C'; setTimeout(function(){el.style.outline='';},2000); }
-  },300);
-}
-// show search bar when admin opens
-function _adminShowSearch(){
-  var bar = document.getElementById('adminSearchBar');
-  if(bar) bar.style.display='block';
-}
-
-// ── 2. BULK ACTIONS ──────────────────────────────────────────
-var _bulkSelected = {places:{}, hotels:{}};
-
-function adminToggleBulk(type, key, checked){
-  if(checked) _bulkSelected[type][key]=true;
-  else delete _bulkSelected[type][key];
-  _updateBulkBar(type);
-}
-function _updateBulkBar(type){
-  var count = Object.keys(_bulkSelected[type]).length;
-  var bar = document.getElementById('bulkBar'+type.charAt(0).toUpperCase()+type.slice(1));
-  var countEl = document.getElementById('bulkCount'+type.charAt(0).toUpperCase()+type.slice(1));
-  if(!bar||!countEl) return;
-  bar.style.display = count>0 ? 'flex' : 'none';
-  countEl.textContent = count+' محدد';
-}
-function adminBulkSelectAll(type){
-  var data=getAdminData();
-  Object.entries(data).forEach(function(e){
-    var key=e[0],p=e[1];
-    var isHotel=(p.bg==='bg-hotel');
-    if((type==='hotels'&&isHotel)||(type==='places'&&!isHotel)){
-      _bulkSelected[type][key]=true;
-      var cb=document.getElementById('bulk-cb-'+key);
-      if(cb) cb.checked=true;
-    }
-  });
-  _updateBulkBar(type);
-}
-function adminBulkClear(type){
-  _bulkSelected[type]={};
-  document.querySelectorAll('.bulk-checkbox').forEach(function(cb){ cb.checked=false; });
-  _updateBulkBar(type);
-}
-async function adminBulkDelete(type){
-  var keys=Object.keys(_bulkSelected[type]);
-  if(!keys.length) return;
-  if(!confirm('حذف '+keys.length+' عنصر؟ هذا الإجراء لا يمكن التراجع عنه.')) return;
-  var data=getAdminData();
-  keys.forEach(function(k){ delete data[k]; });
-  await adminSaveData(data);
-  _bulkSelected[type]={};
-  renderAdminPlaces(); renderAdminHotels();
-  _updateBulkBar(type);
-  adminLogActivity('delete','حذف '+keys.length+' '+(type==='hotels'?'فندق':'مكان')+' دفعة واحدة');
-  if(typeof showToast==='function') showToast('تم حذف '+keys.length+' عناصر','success');
-}
-
-// ── 3. ACTIVITY LOG ──────────────────────────────────────────
-var _activityLog = [];
-var _logFilter = 'all';
-var _LOG_KEY = 'wahat_admin_activity_log';
-var _LOG_MAX = 200;
-
-function adminLogActivity(type, msg){
-  var entry = {
-    type: type,
-    msg: msg,
-    time: new Date().toISOString(),
-    ts: Date.now()
-  };
-  var stored = [];
-  try{ stored=JSON.parse(localStorage.getItem(_LOG_KEY)||'[]'); }catch(e){}
-  stored.unshift(entry);
-  if(stored.length>_LOG_MAX) stored=stored.slice(0,_LOG_MAX);
-  localStorage.setItem(_LOG_KEY, JSON.stringify(stored));
-  _activityLog = stored;
-}
-function adminLoadActivityLog(){
-  try{ _activityLog=JSON.parse(localStorage.getItem(_LOG_KEY)||'[]'); }catch(e){ _activityLog=[]; }
-  _renderActivityLog();
-}
-function adminFilterLog(type){
-  _logFilter=type;
-  document.querySelectorAll('[id^="log-filter-"]').forEach(function(b){b.classList.remove('active');});
-  var el=document.getElementById('log-filter-'+type);
-  if(el) el.classList.add('active');
-  _renderActivityLog();
-}
-function _renderActivityLog(){
-  var list=document.getElementById('activityLogList');
-  if(!list) return;
-  var items=_logFilter==='all'?_activityLog:_activityLog.filter(function(e){return e.type===_logFilter;});
-  if(!items.length){
-    list.innerHTML='<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.25);font-size:0.85rem">لا توجد سجلات</div>';
-    return;
-  }
-  var icons={add:'➕',edit:'✏️',delete:'🗑️',login:'🔑',booking:'📦',upload:'📤',save:'💾',push:'🔔'};
-  var colors={add:'rgba(74,222,128,0.15)',edit:'rgba(20,184,204,0.12)',delete:'rgba(239,68,68,0.12)',login:'rgba(201,168,76,0.12)',booking:'rgba(245,158,11,0.12)',upload:'rgba(139,92,246,0.12)',save:'rgba(14,165,233,0.12)',push:'rgba(251,191,36,0.1)'};
-  list.innerHTML=items.slice(0,50).map(function(e){
-    var d=new Date(e.time);
-    var timeStr=d.toLocaleDateString('ar-EG')+'  '+d.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
-    var ic=icons[e.type]||'📌';
-    var bg=colors[e.type]||'rgba(255,255,255,0.04)';
-    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:'+bg+';border:1px solid rgba(255,255,255,0.06);border-radius:10px">'+
-      '<span style="font-size:1.1rem;flex-shrink:0">'+ic+'</span>'+
-      '<span style="flex:1;color:rgba(255,255,255,0.8);font-size:0.83rem">'+_esc(e.msg)+'</span>'+
-      '<span style="color:rgba(255,255,255,0.25);font-size:0.72rem;white-space:nowrap;flex-shrink:0">'+timeStr+'</span>'+
-      '</div>';
-  }).join('');
-}
-function adminClearActivityLog(){
-  if(!confirm('مسح كل سجل النشاط؟')) return;
-  localStorage.removeItem(_LOG_KEY);
-  _activityLog=[];
-  _renderActivityLog();
-}
-// تسجيل دخول الأدمن تلقائي
-// adminLogin activity logging handled directly in adminLogin function
-
-// ── 4. PUSH NOTIFICATION من الأدمن ──────────────────────────
-async function adminSendPushNotif(){
-  var title=document.getElementById('pushTitle')?.value.trim();
-  var body=document.getElementById('pushBody')?.value.trim();
-  var url=document.getElementById('pushUrl')?.value.trim()||'/';
-  var status=document.getElementById('pushStatus');
-  if(!title||!body){ if(typeof showToast==='function') showToast('اكتب العنوان والنص أولاً','warning'); return; }
-  if(status){ status.style.display='block'; status.style.background='rgba(20,184,204,0.1)'; status.style.color='#14B8CC'; status.style.border='1px solid rgba(20,184,204,0.3)'; status.textContent='⏳ جاري الإرسال...'; }
-  try{
-    // بعت لكل الـ SW subscriptions المتاحة
-    var sent=0;
-    if('serviceWorker' in navigator){
-      var reg = await navigator.serviceWorker.ready;
-      // إشعار محلي كـ preview
-      if(Notification.permission==='granted'){
-        reg.showNotification('🌊 '+title,{
-          body:body, icon:'/icons/icon-192x192.png',
-          badge:'/icons/icon-72x72.png', dir:'rtl', lang:'ar',
-          tag:'wahat-push-'+Date.now(), data:{url:url}
-        });
-        sent++;
-      }
-    }
-    adminLogActivity('push','إرسال إشعار: '+title);
-    if(status){ status.textContent='✅ تم الإرسال ('+(sent)+' إشعار)'; status.style.background='rgba(74,222,128,0.1)'; status.style.color='#4ade80'; status.style.border='1px solid rgba(74,222,128,0.3)'; }
-    setTimeout(function(){ if(status) status.style.display='none'; },3000);
-    document.getElementById('pushTitle').value='';
-    document.getElementById('pushBody').value='';
-  }catch(e){
-    if(status){ status.textContent='❌ فشل الإرسال: '+e.message; status.style.background='rgba(239,68,68,0.1)'; status.style.color='#f87171'; status.style.border='1px solid rgba(239,68,68,0.3)'; }
-  }
-}
-
-// ── 5. PLACE STATS ───────────────────────────────────────────
-function adminLoadPlaceStats(){
-  var grid=document.getElementById('placeStatsGrid');
-  if(!grid) return;
-  var data=getAdminData();
-  var entries=Object.entries(data);
-  if(!entries.length){ grid.innerHTML='<div style="color:rgba(255,255,255,0.3);text-align:center;padding:20px;grid-column:1/-1">لا توجد أماكن</div>'; return; }
-  // احسب الـ stats من localStorage
-  var placeClicks={};
-  try{
-    var raw=localStorage.getItem('wahat_place_clicks');
-    if(raw) placeClicks=JSON.parse(raw);
-  }catch(e){}
-  var sorted=entries.map(function(e){
-    return {key:e[0],place:e[1],clicks:placeClicks[e[0]]||0};
-  }).sort(function(a,b){return b.clicks-a.clicks;});
-  grid.innerHTML=sorted.slice(0,12).map(function(item){
-    var p=item.place;
-    var img=p.images&&p.images[0]?_proxyImgUrl(p.images[0]):'';
-    var pct=sorted[0].clicks>0?Math.round(item.clicks/sorted[0].clicks*100):0;
-    return '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px">'+
-      (img?'<img src="'+_esc(img)+'" style="width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">':'<div style="width:44px;height:44px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">'+_esc(p.emoji)+'</div>')+
-      '<div style="flex:1;min-width:0">'+
-        '<div style="color:#fff;font-size:0.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+_esc(p.title)+'</div>'+
-        '<div style="display:flex;align-items:center;gap:6px;margin-top:4px">'+
-          '<div style="flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:2px"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#0A7E8C,#14B8CC);border-radius:2px"></div></div>'+
-          '<span style="color:rgba(255,255,255,0.35);font-size:0.7rem;white-space:nowrap">'+item.clicks+' ضغطة</span>'+
-        '</div>'+
-      '</div>'+
-    '</div>';
-  }).join('');
-}
-// تسجيل ضغطة على المكان
-var _origOpenModal=window.openModal;
-setTimeout(function(){
-  if(typeof openModal==='function'){
-    var _orig=openModal;
-    window.openModal=function(id){
-      try{
-        var clicks={}; try{clicks=JSON.parse(localStorage.getItem('wahat_place_clicks')||'{}');}catch(e){}
-        clicks[id]=(clicks[id]||0)+1;
-        localStorage.setItem('wahat_place_clicks',JSON.stringify(clicks));
-      }catch(e){}
-      return _orig.apply(this,arguments);
-    };
-  }
-},2000);
-
-// ── 6. EXPORT EXCEL للأماكن ──────────────────────────────────
-function adminExportPlacesExcel(){
-  var data=getAdminData();
-  var rows=[['المفتاح','الاسم','الفئة','الوصف','السعر','التقييم','الغرف','الموسم','عدد الصور']];
-  Object.entries(data).forEach(function(e){
-    var k=e[0],p=e[1];
-    rows.push([
-      k, p.title||'', p.bg||'', (p.desc||'').replace(/
-/g,' '),
-      p.info&&p.info[0]?p.info[0].value:'',
-      p.info&&p.info[1]?p.info[1].value:'',
-      p.info&&p.info[2]?p.info[2].value:'',
-      p.info&&p.info[3]?p.info[3].value:'',
-      p.images?p.images.length:0
-    ]);
-  });
-  var csv=rows.map(function(r){
-    return r.map(function(c){return '"'+(String(c||'').replace(/"/g,'""'))+'"';}).join(',');
-  }).join('\n');
-  var BOM='\ufeff';
-  var blob=new Blob([BOM+csv],{type:'text/csv;charset=utf-8;'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');
-  a.href=url; a.download='wahat-sudr-places-'+new Date().toISOString().slice(0,10)+'.csv';
-  a.click(); URL.revokeObjectURL(url);
-  adminLogActivity('save','تصدير Excel للأماكن ('+Object.keys(data).length+' مكان)');
-  if(typeof showToast==='function') showToast('تم تصدير الأماكن كـ CSV','success');
-}
-
-// ── 7. BULK CHECKBOX في renderAdminPlaces ────────────────────
-var _origRenderAdminPlaces=null;
-setTimeout(function(){
-  if(typeof renderAdminPlaces==='function'){
-    _origRenderAdminPlaces=renderAdminPlaces;
-  }
-},500);
-
-// ── _adminShowSearch يتعمل call من adminLogin مباشرة ──────
-
-// ══════════════════════════════════════════════════════════════
-// نهاية إضافات لوحة التحكم
-// ══════════════════════════════════════════════════════════════
 
 
 

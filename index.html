@@ -7578,17 +7578,31 @@ setTimeout(loadFeatSettings, 300); // fallback
       if(data && typeof data === 'object'){
         active = data.active === true;
         if(data.msg) msg = data.msg;
-        // Sync to localStorage
-        localStorage.setItem('wahat_maintenance', active ? '1' : '0');
-        if(data.msg) localStorage.setItem('wahat_maint_msg', data.msg);
+        // Sync to localStorage — لو Supabase قال false امسح القيمة القديمة
+        if(!active){
+          localStorage.removeItem('wahat_maintenance');
+          localStorage.removeItem('wahat_maint_msg');
+        } else {
+          localStorage.setItem('wahat_maintenance', '1');
+          if(data.msg) localStorage.setItem('wahat_maint_msg', data.msg);
+        }
       } else if(data === true){ active = true; }
+      else {
+        // Supabase رجع null أو undefined — مش في صيانة
+        active = false;
+        localStorage.removeItem('wahat_maintenance');
+      }
     } else {
+      // SB_READY مش جاهز بعد — افترض مش في صيانة (الـ default الآمن)
+      // فقط اعرض الصيانة لو الـ localStorage مضبوط صراحةً
       active = localStorage.getItem('wahat_maintenance') === '1';
       let savedMsg = localStorage.getItem('wahat_maint_msg');
       if(savedMsg) msg = savedMsg;
     }
   }catch(e){
-    active = localStorage.getItem('wahat_maintenance') === '1';
+    // في حالة error — افترض مش في صيانة (الـ default الآمن)
+    active = false;
+    localStorage.removeItem('wahat_maintenance');
   }
 
   let overlay = document.getElementById('maintenanceOverlay');

@@ -76,11 +76,38 @@
     Cache-Control = "no-store"
     X-Content-Type-Options = "nosniff"
 
+# ملفات حقيقية موجودة — تُحمَّل مباشرة بدون redirect
 [[redirects]]
-  from = "/404"
+  from = "/404.html"
   to = "/404.html"
-  status = 404
+  status = 200
 
+[[redirects]]
+  from = "/offline.html"
+  to = "/offline.html"
+  status = 200
+
+[[redirects]]
+  from = "/manifest.json"
+  to = "/manifest.json"
+  status = 200
+
+[[redirects]]
+  from = "/sw.js"
+  to = "/sw.js"
+  status = 200
+
+[[redirects]]
+  from = "/robots.txt"
+  to = "/robots.txt"
+  status = 200
+
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/sitemap.xml"
+  status = 200
+
+# SPA — كل URL يروح لـ index.html (بدون 404)
 [[redirects]]
   from = "/*"
   to = "/index.html"

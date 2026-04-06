@@ -7997,6 +7997,18 @@ if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){
 //  WAHAT SUDR — Extra Features JS (clean, no conflicts)
 // ════════════════════════════════════════════════════════════
 
+// ── 404 Client-Side Handler ─────────────────────────────────
+(function(){
+  var path = window.location.pathname;
+  // الـ SPA بتاعنا بيستخدم hash routing (#section)
+  // أي pathname غير / هو مسار غلط → redirect للـ 404
+  var validPaths = ['/', '/index.html'];
+  if(validPaths.indexOf(path) === -1 && !path.match(/\.(html|js|json|txt|xml|png|jpg|ico|webp|svg|css|woff|woff2)$/i)){
+    // مسار غير موجود → اعرض صفحة 404
+    window.location.replace('/404.html');
+  }
+})();
+
 // ── Translation state init ──
 (function(){
   let saved=localStorage.getItem('ws_lang');

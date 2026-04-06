@@ -7968,8 +7968,7 @@ if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){
           if(newSW){
             newSW.addEventListener('statechange', function(){
               if(newSW.state === 'activated'){
-                // New version active — show update toast
-                if(typeof showToast==='function') showToast('\u2728 \u062a\u0645 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0645\u0648\u0642\u0639 — \u0627\u0636\u063a\u0637 \u0647\u0646\u0627 \u0644\u0644\u062a\u062d\u062f\u064a\u062b','info');
+                // SW updated — silent, SW_UPDATED message handles reload
               }
             });
           }
@@ -7985,10 +7984,8 @@ if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){
       const now = Date.now();
       if(now - lastReload < 30000) return;
       sessionStorage.setItem('_sw_reload_ts', String(now));
-      // أظهر toast للمستخدم بدل الـ reload التلقائي المباشر
-      if(typeof showToast === 'function'){
-        showToast('✨ يوجد تحديث — اضغط لتحديث الصفحة', 'info');
-      }
+      // reload تلقائي هادئ بدون toast — أفضل UX
+      window.location.reload();
     }
   });
 }

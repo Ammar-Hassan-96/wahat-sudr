@@ -1455,6 +1455,31 @@ function _esc(str){
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#039;');
 }
+
+// ── Image Proxy via Supabase Edge Function ──────────────────────
+// بيحل مشكلة Hotlink Protection على Android Chrome
+// الـ proxy بيجيب الصورة من السيرفر بدل المتصفح مباشرة
+const _IMG_PROXY = 'https://sxdjhjjwadolezkuwxrt.supabase.co/functions/v1/img-proxy';
+const _PROXY_DOMAINS = [
+  'top4top.io', 'imgbb.com', 'postimg.cc', 'ibb.co',
+  'tinypic.com', 'imageshack.com', 'photobucket.com'
+];
+function _needsProxy(url){
+  if(!url || url.startsWith('data:')) return false;
+  if(url.includes('supabase.co')) return false;
+  if(url.includes('unsplash.com')) return false;
+  if(url.includes('youtube.com') || url.includes('youtu.be')) return false;
+  if(url.includes('facebook.com') || url.includes('fb.watch')) return false;
+  try{
+    var host = new URL(url).hostname;
+    return _PROXY_DOMAINS.some(function(d){ return host.endsWith(d); });
+  }catch(e){ return false; }
+}
+function _proxyImgUrl(url){
+  if(!url) return url;
+  if(!_needsProxy(url)) return url;
+  return _IMG_PROXY + '?url=' + encodeURIComponent(url);
+}
 // ═══ Simple SHA-256 hash — لتشفير كلمة مرور الأدمن ═══
 async function _sha256(str){
   let buf = new TextEncoder().encode(str);
@@ -2941,7 +2966,7 @@ function renderPlacesGrid(){
   grid.innerHTML = entries.map(([key, p]) => {
     const cfg  = catConfig[p.bg] || {cat:'other', tag:'📍 مكان', btnText:'📅 احجز', primary:'booking'};
     const actionCfg = getPlaceActionConfig(p, cfg);
-    const img  = (p.images && p.images[0]) || '';
+    const img  = _proxyImgUrl((p.images && p.images[0]) || '');
     const price = p.info?.[0]?.value || '';
     const hours = p.info?.[1]?.value || '';
     const feat  = p.info?.[2]?.value || '';
@@ -3050,7 +3075,7 @@ function openModal(id){
       // crossOrigin anonymous للـ Supabase Storage URLs عشان Android Chrome
       var isStorage = src.includes('supabase.co/storage');
       var crossAttr = isStorage ? ' crossorigin="anonymous"' : '';
-      return '<div class="carousel-slide"><img src="'+_esc(src)+'" alt="'+_esc(data.title)+'" loading="'+(i===0?'eager':'lazy')+'" decoding="async"'+crossAttr+' onerror="this.onerror=null;this.style.opacity=\'0.3\'"></div>';
+      return '<div class="carousel-slide"><img src="'+_esc(_proxyImgUrl(src))+'" alt="'+_esc(data.title)+'" loading="'+(i===0?'eager':'lazy')+'" decoding="async"'+crossAttr+' onerror="this.onerror=null;this.style.opacity=\'0.3\'"></div>';
     }).join('');
   const dots=_carImgs.length>1?`<div class="carousel-dots">${_carImgs.map((_,i)=>`<button class="carousel-dot${i===0?' active':''}" onclick="carouselGo(${i})"></button>`).join('')}</div>`:'';
   const nav=_carImgs.length>1?`<button class="carousel-btn prev" onclick="carouselStep(1)">&#8249;</button><button class="carousel-btn next" onclick="carouselStep(-1)">&#8250;</button><div class="carousel-counter"><span id="carNum">1</span>/${_carImgs.length}</div>`:'';
@@ -5500,7 +5525,7 @@ function _adminMediaThumb(src){
     return '<div style="width:100%;height:100%;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center"><span style="font-size:1.5rem">\ud83c\udfac</span></div>';
   }
   var _cross = src.includes('supabase.co') ? ' crossorigin="anonymous"' : '';
-  return '<img loading="lazy" src="'+_esc(src)+'" alt="صورة" style="width:100%;height:100%;object-fit:cover;display:block"'+_cross+' onerror="this.onerror=null;this.style.opacity=\'0.2\'">';
+  return '<img loading="lazy" src="'+_esc(_proxyImgUrl(src))+'" alt="صورة" style="width:100%;height:100%;object-fit:cover;display:block"'+_cross+' onerror="this.onerror=null;this.style.opacity=\'0.2\'">';
 }
 
 function renderAdminPlaces(){
@@ -5544,7 +5569,7 @@ function renderAdminPlaces(){
               ondrop="event.preventDefault();event.currentTarget.style.outline='none';event.currentTarget.style.opacity='1';adminReorderImg('${key}',${i})"
               ondragend="event.currentTarget.style.opacity='1';event.currentTarget.style.outline='none'">
               <div style="position:relative;width:72px;height:60px;border-radius:8px;overflow:hidden;border:2px solid rgba(255,255,255,0.12)">
-                <img loading="lazy" src="${_esc(src)}" alt="صورة المكان" style="width:100%;height:100%;object-fit:cover;display:block" ${_esc(src).includes('supabase.co') ? 'crossorigin="anonymous"' : ''} onerror="this.onerror=null;this.style.opacity='0.2';this.style.background='rgba(255,255,255,0.05)'">
+                <img loading="lazy" src="${_esc(_proxyImgUrl(src))}" alt="صورة المكان" style="width:100%;height:100%;object-fit:cover;display:block" ${_esc(src).includes('supabase.co') ? 'crossorigin="anonymous"' : ''} onerror="this.onerror=null;this.style.opacity='0.2';this.style.background='rgba(255,255,255,0.05)'">
                 <div style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(7,26,44,0.9);color:rgba(255,255,255,0.8);font-size:0.58rem;font-weight:900;display:flex;align-items:center;justify-content:center">${i+1}</div>
               </div>
               <div style="display:flex;justify-content:space-between;margin-top:3px;gap:2px">
@@ -5605,7 +5630,7 @@ function renderAdminHotels(){
               ondrop="event.preventDefault();event.currentTarget.style.outline='none';event.currentTarget.style.opacity='1';adminReorderImg('${key}',${i})"
               ondragend="event.currentTarget.style.opacity='1';event.currentTarget.style.outline='none'">
               <div style="position:relative;width:72px;height:60px;border-radius:8px;overflow:hidden;border:2px solid rgba(255,255,255,0.12)">
-                <img loading="lazy" src="${_esc(src)}" alt="صورة المكان" style="width:100%;height:100%;object-fit:cover;display:block" ${_esc(src).includes('supabase.co') ? 'crossorigin="anonymous"' : ''} onerror="this.onerror=null;this.style.opacity='0.2';this.style.background='rgba(255,255,255,0.05)'">
+                <img loading="lazy" src="${_esc(_proxyImgUrl(src))}" alt="صورة المكان" style="width:100%;height:100%;object-fit:cover;display:block" ${_esc(src).includes('supabase.co') ? 'crossorigin="anonymous"' : ''} onerror="this.onerror=null;this.style.opacity='0.2';this.style.background='rgba(255,255,255,0.05)'">
                 <div style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(7,26,44,0.9);color:rgba(255,255,255,0.8);font-size:0.58rem;font-weight:900;display:flex;align-items:center;justify-content:center">${i+1}</div>
               </div>
               <div style="display:flex;justify-content:space-between;margin-top:3px;gap:2px">
@@ -8425,7 +8450,7 @@ function adminLoadPlaces(){
   list.innerHTML=entries.map(function(e){
     let key=e[0],p=e[1],img=(p.images&&p.images[0])||'';
     return'<div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px;margin-bottom:8px">'
-      +'<div style="width:56px;height:56px;border-radius:8px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,0.08)">'+(img?'<img loading="lazy" src="'+_esc(img)+'" alt="'+_esc(p.title)+'" style="width:100%;height:100%;object-fit:cover"'+(img.includes('supabase.co')?' crossorigin="anonymous"':'')+' onerror="this.onerror=null;this.style.opacity=\'0.2\'">'  :'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem">'+_esc(p.emoji)+'</div>')+'</div>'
+      +'<div style="width:56px;height:56px;border-radius:8px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,0.08)">'+(img?(function(){var _pi=_proxyImgUrl(img);return'<img loading="lazy" src="'+_esc(_pi)+'" alt="'+_esc(p.title)+'" style="width:100%;height:100%;object-fit:cover"'+(_pi.includes('supabase.co')?' crossorigin="anonymous"':'')+' onerror="this.onerror=null;this.style.opacity=\'0.2\'">';})():'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem">'+_esc(p.emoji)+'</div>')+'</div>'
       +'<div style="flex:1;min-width:0"><div style="color:#fff;font-size:0.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.title+'</div><div style="color:rgba(255,255,255,0.4);font-size:0.7rem">'+(p.images?p.images.length:0)+' صورة</div></div>'
       +'<button onclick="adminEditPlaceImages(\''+key+'\')" style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);color:#E8C97A;border-radius:8px;padding:5px 10px;cursor:pointer;font-family:Cairo,sans-serif;font-size:0.75rem;font-weight:700;flex-shrink:0">🖼️ الصور</button>'
       +'</div>';

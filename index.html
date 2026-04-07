@@ -8964,9 +8964,7 @@ function adminExportPlacesCSV(){
       k,
       p.title||'',
       p.bg||'',
-      (p.desc||'').replace(/[
-
-]/g,' '),
+      (p.desc||'').replace(/[\n\r]/g,' '),
       p.info&&p.info[0] ? p.info[0].value : '',
       p.info&&p.info[1] ? p.info[1].value : '',
       p.info&&p.info[2] ? p.info[2].value : '',
@@ -9652,6 +9650,7 @@ function _shareTrip(){
 (async function load7DayWeather(){
   try{
     let r=await fetch('/.netlify/functions/weather?mode=daily');
+    if(!r.ok) throw new Error('HTTP '+r.status);
     let resp=await r.json();
     let d=(resp.source==='openmeteo')?resp.data:null;
     if(!d||!d.daily) return;

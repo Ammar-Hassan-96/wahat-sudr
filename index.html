@@ -4850,7 +4850,7 @@ async function sbSet(key, value){
 
 // ── Data helpers: Supabase first, timestamped localStorage fallback ──
 // كل قيمة محفوظة مع timestamp — يمنع ظهور بيانات قديمة أو stale
-const _LS_TTL = 5 * 60 * 1000; // 5 دقائق — بعدها نجيب من Supabase مباشرة
+const _LS_TTL = 30 * 60 * 1000; // 30 دقيقة — يقلل API calls — بعدها نجيب من Supabase مباشرة
 
 function _lsSet(key, value){
   try{
@@ -4961,7 +4961,7 @@ async function saveToDB(key, value){
         }
       }, 30000);
 
-      if(_sbIsProd) console.log('%c🔄 Realtime متصل — التحديثات لحظية','color:#4ade80;font-weight:bold');
+      if(_sbIsProd) console.log('%c🔄 Polling متصل — التحديثات كل 5 دقائق','color:#4ade80;font-weight:bold');
     };
 
     _rtWs.onmessage = function(evt){
@@ -5063,14 +5063,14 @@ async function saveToDB(key, value){
           }
         }catch(e){}
       }
-    }, 60000);
+    }, 300000); // 5 دقائق بدل 60 ثانية — يوفر 80% من الـ Egress
   }
 
   // ── بدء الاتصال ──
-  // انتظر لحد ما الصفحة تحمل خالص
+  // WebSocket موقوف لتوفير الـ Egress — Polling فقط كل 5 دقائق
   function _rtInit(){
-    _rtConnect();
-    _rtStartPolling(); // Fallback polling
+    // _rtConnect(); // WebSocket موقوف مؤقتاً لتقليل Supabase Egress
+    _rtStartPolling(); // Polling كل 5 دقائق يكفي للموقع السياحي
   }
 
   if(document.readyState === 'complete'){

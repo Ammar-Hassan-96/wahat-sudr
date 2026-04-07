@@ -8964,7 +8964,8 @@ function adminExportPlacesCSV(){
       p.title||'',
       p.bg||'',
       (p.desc||'').replace(/[
-]/g,' '),
+
+]/g,' '),
       p.info&&p.info[0] ? p.info[0].value : '',
       p.info&&p.info[1] ? p.info[1].value : '',
       p.info&&p.info[2] ? p.info[2].value : '',
@@ -8973,9 +8974,8 @@ function adminExportPlacesCSV(){
     ]);
   });
   var csv = rows.map(function(r){
-    return r.map(function(c){ return '"'+String(c||'').replace(/"/g,'""')+'"'; }).join(',');
-  }).join('
-');
+    var q=String.fromCharCode(34); return r.map(function(c){ return q+String(c||'').replace(new RegExp(q,'g'),q+q)+q; }).join(',');
+  }).join('\n');
   var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
   var url  = URL.createObjectURL(blob);
   var a    = document.createElement('a');

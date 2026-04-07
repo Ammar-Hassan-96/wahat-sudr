@@ -8032,7 +8032,7 @@ if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){
     // Offline page: /offline.html — shown by SW when network fails
     navigator.serviceWorker.register('/sw.js', {scope:'/'})
       .then(function(reg){
-        console.log('[SW] Registered v2026-04-06-v15');
+        console.log('[SW] Registered v2026-04-06-v16');
         // Check for updates every 60 seconds
         setInterval(function(){ reg.update(); }, 60000);
         // When a new SW is found, activate it

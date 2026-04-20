@@ -54,7 +54,7 @@ y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
 <link rel="icon" type="image/png" sizes="96x96" href="/icons/icon-96x96.png">
 <!-- ══ TravelAgency + AggregateRating Schema ══ -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TouristInformationCenter","name":"واحة سدر السياحية","alternateName":"Wahat Sudr","description":"دليلك الشامل لرأس سدر — فنادق، شواطئ، عيون كبريتية، كايت سيرف","url":"https://wahat-sudr.netlify.app/","telephone":"+201144897131","address":{"@type":"PostalAddress","addressLocality":"رأس سدر","addressRegion":"جنوب سيناء","addressCountry":"EG"},"geo":{"@type":"GeoCoordinates","latitude":29.5993,"longitude":32.7084},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","bestRating":"5","worstRating":"1","ratingCount":"247"}}
+{"@context":"https://schema.org","@type":"TouristInformationCenter","name":"واحة سدر السياحية","alternateName":"Wahat Sudr","description":"دليلك الشامل لرأس سدر — فنادق، شواطئ، عيون كبريتية، كايت سيرف","url":"https://wahat-sudr.netlify.app/","telephone":"+201144897131","address":{"@type":"PostalAddress","addressLocality":"رأس سدر","addressRegion":"جنوب سيناء","addressCountry":"EG"},"geo":{"@type":"GeoCoordinates","latitude":29.5993,"longitude":32.7084}}
 </script>
 <!-- ══ BreadcrumbList Schema ══ -->
 <script type="application/ld+json">
@@ -1527,10 +1527,10 @@ function _canSubmitForm(formName, cooldownMs){
   <h1 style="color:#C9A84C;font-size:2rem;font-weight:900;margin-bottom:12px">الموقع تحت الصيانة</h1>
   <p id="maintOverlayMsg" style="color:rgba(255,255,255,0.6);font-size:1rem;max-width:400px;line-height:1.8;margin-bottom:32px">نعمل على تحسين تجربتك — سنعود قريباً 🌊</p>
   <a href="https://wa.me/201144897131" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;text-decoration:none;border-radius:14px;padding:12px 28px;font-weight:700;font-size:0.95rem">💬 تواصل معنا عبر واتساب</a>
-  <p style="color:rgba(255,255,255,0.2);font-size:0.72rem;margin-top:40px">واحة سدر السياحية — رأس سدر، جنوب سيناء</p>
+  <p id="maintSecret" style="color:rgba(255,255,255,0.2);font-size:0.72rem;margin-top:40px;cursor:default;user-select:none" onclick="if(!window._mc){window._mc=0;setTimeout(function(){window._mc=0},2000)}window._mc++;if(window._mc>=3){window._mc=0;document.getElementById('maintAdminHint').style.display='flex';this.style.color='rgba(201,168,76,0.6)';}">واحة سدر السياحية — رأس سدر، جنوب سيناء</p>
 
-  <!-- Admin secret access — hidden in corner -->
-  <div id="maintAdminHint" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px">
+  <!-- Admin secret access — triple-click on logo to reveal -->
+  <div id="maintAdminHint" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:8px">
     <button onclick="maintAdminAccess()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.2);border-radius:10px;padding:6px 16px;cursor:pointer;font-family:Cairo,sans-serif;font-size:0.72rem;transition:all .3s" onmouseover="this.style.color='rgba(255,255,255,0.7)';this.style.borderColor='rgba(201,168,76,0.4)'" onmouseout="this.style.color='rgba(255,255,255,0.2)';this.style.borderColor='rgba(255,255,255,0.1)'">
       ⚙️ دخول الأدمن
     </button>
@@ -1622,13 +1622,13 @@ window._applyAnnouncementPayload = function(ann){
 
 <div class="emergency-bar">
   <div class="em-items">
-    <div class="em-item">🚑 <a href="tel:123">إسعاف: 123</a></div>
+    <div class="em-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M5 8h14M12 3v5M8 21h8a3 3 0 0 0 3-3v-7a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3zM10 14h4M12 12v4"/></svg> <a href="tel:123">إسعاف: 123</a></div>
     <span class="em-divider">|</span>
-    <div class="em-item">🚒 <a href="tel:180">مطافي: 180</a></div>
+    <div class="em-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M12 2c0 4-3 5-3 9a3 3 0 0 0 6 0c0-1-1-2-1-2M12 2s2 2 2 4"/></svg> <a href="tel:180">مطافي: 180</a></div>
     <span class="em-divider">|</span>
-    <div class="em-item">🛡️ <a href="tel:126">شرطة السياحة: 126</a></div>
+    <div class="em-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> <a href="tel:126">شرطة السياحة: 126</a></div>
     <span class="em-divider">|</span>
-    <div class="em-item">📞 <a href="tel:0693270034">طوارئ رأس سدر: 0693270034</a></div>
+    <div class="em-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.961.361 1.905.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.905.339 1.849.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> <a href="tel:0693270034">طوارئ رأس سدر: 0693270034</a></div>
   </div>
 </div>
 
@@ -1650,9 +1650,9 @@ window._applyAnnouncementPayload = function(ann){
     <li><a href="#tips" data-ar="نصائح" data-en="Tips">نصائح</a></li>
     <li><a href="#map" data-ar="الخريطة" data-en="Map">الخريطة</a></li>
     <li><a href="#faq" data-ar="أسئلة" data-en="FAQ">أسئلة</a></li>
-    <li><a href="#blog" data-ar="📰 مقالات" data-en="📰 Blog">📰 مقالات</a></li>
-    <li><a href="#offers" style="color:#f59e0b">🎯 العروض</a></li>
-    <li><a href="#contact" class="nav-cta" data-ar="📞 تواصل معنا" data-en="📞 Contact">📞 تواصل معنا</a></li>
+    <li><a href="#blog" data-ar="مقالات" data-en="Blog">مقالات</a></li>
+    <li><a href="#offers" style="color:#f59e0b" data-ar="العروض" data-en="Offers">العروض</a></li>
+    <li><a href="#contact" class="nav-cta" data-ar="تواصل معنا" data-en="Contact">تواصل معنا</a></li>
   </ul>
   <div class="nav-controls">
     <div class="lang-toggle" id="langToggle" title="تغيير اللغة / Change Language">
@@ -1660,8 +1660,8 @@ window._applyAnnouncementPayload = function(ann){
       <button class="lang-btn active" id="btnAr" onclick="setLang('ar')">العربية</button>
       <button class="lang-btn" id="btnEn" onclick="setLang('en')">EN</button>
     </div>
-    <button class="theme-toggle" id="themeToggle" aria-label="تبديل المظهر الداكن والفاتح" title="تبديل المظهر" onclick="toggleTheme()">🌙</button>
-    <button class="nav-admin-btn" id="navAdminBtn" onclick="showAdminPanel()" title="لوحة التحكم" aria-label="لوحة التحكم">⚙️</button>
+    <button class="theme-toggle" id="themeToggle" aria-label="تبديل المظهر الداكن والفاتح" title="تبديل المظهر" onclick="toggleTheme()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+    <button class="nav-admin-btn" id="navAdminBtn" onclick="showAdminPanel()" title="لوحة التحكم" aria-label="لوحة التحكم"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
     <button class="nav-toggle" id="navToggle" onclick="toggleNav()" aria-label="فتح/إغلاق القائمة" aria-expanded="false" aria-controls="navLinks">☰</button>
   </div>
 </nav>
@@ -1690,8 +1690,8 @@ window._applyAnnouncementPayload = function(ann){
         شواطئ رائعة، عيون كبريتية علاجية، ومعالم تاريخية فريدة تنتظر اكتشافك.
       </p>
       <div class="hero-buttons">
-        <a href="#places" class="btn-primary">🗺️ استكشف الأماكن</a>
-        <button class="btn-secondary" onclick="openBooking()">📅 احجز رحلتك</button>
+        <a href="#places" class="btn-primary">استكشف الأماكن</a>
+        <button class="btn-secondary" onclick="openBooking()">احجز رحلتك</button>
       </div>
       <div class="hero-stats">
         <div class="stat"><span class="stat-num">+30</span><span class="stat-label">مكان سياحي</span></div>
@@ -2661,9 +2661,11 @@ function toggleTheme(){
   // Force reflow without hiding body to prevent white flash.
   void html.offsetHeight;
   requestAnimationFrame(function(){ html.classList.remove('theme-switching'); });
-  // Update buttons
+  // Update buttons with SVG icons
   let mainBtn = document.getElementById('themeToggle');
-  if(mainBtn) mainBtn.textContent = isDark ? '☀️' : '🌙';
+  const moonSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  const sunSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+  if(mainBtn) mainBtn.innerHTML = isDark ? sunSvg : moonSvg;
   document.querySelectorAll('[data-theme-btn]').forEach(function(b){
     b.textContent = isDark ? '☀️/🌙' : '🌙/☀️';
   });
@@ -2674,7 +2676,11 @@ try{
   if(saved){
     document.documentElement.setAttribute('data-theme',saved);
     let _tBtn = document.getElementById('themeToggle');
-    if(_tBtn) _tBtn.textContent = saved==='light'?'☀️':'🌙';
+    if(_tBtn){
+      const moonSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+      const sunSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+      _tBtn.innerHTML = saved==='light'?sunSvg:moonSvg;
+    }
   }
 }catch(e){}
 

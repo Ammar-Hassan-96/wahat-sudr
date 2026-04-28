@@ -3885,7 +3885,19 @@ function toggleFaq(btn){
       <button class="atab" onclick="aTab('maintenance')" id="tab-maintenance" style="color:#f87171;border-color:rgba(239,68,68,0.3)">🛡️ الصيانة</button>
     </div>
     <!-- Supabase status bar -->
-    <div id="sbStatusBar" style="display:none;margin:16px 24px 0;border:1px solid;border-radius:12px;padding:10px 16px;font-size:0.82rem;color:rgba(255,255,255,0.8)"></div>
+    <div id="sbStatusBar" style="display:none;margin:16px 24px 0;border:1px solid;border-radius:12px;padding:12px 16px;font-size:0.82rem;color:rgba(255,255,255,0.8)">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span id="sbDot" style="width:10px;height:10px;border-radius:50%;background:#6b7280;display:inline-block;flex-shrink:0"></span>
+          <span id="sbStatusText">جاري الاتصال...</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span id="sbSaveStatus" style="font-size:0.75rem;opacity:0.7"></span>
+          <button onclick="showSBStatus(true)" title="تحقق من الاتصال الآن"
+            style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:0.72rem;font-family:Cairo,sans-serif">🔄 فحص</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Panels -->
     <div style="padding:24px;max-width:1100px;margin:0 auto">
@@ -4741,6 +4753,7 @@ function toggleFaq(btn){
 .admin-place-cat-select{appearance:none;-webkit-appearance:none;font-size:0.72rem;background:rgba(10,126,140,0.18);color:#14B8CC;border:1px solid rgba(20,184,204,0.3);border-radius:20px;padding:3px 10px;cursor:pointer;outline:none;font-family:Cairo,sans-serif;transition:border-color .2s}
 .admin-place-cat-select:hover{border-color:rgba(20,184,204,0.7);background:rgba(10,126,140,0.28)}
 .admin-place-cat-select option{background:#0d1c2e;color:#fff}
+@keyframes sbPulse{0%,100%{opacity:1}50%{opacity:0.45}}
 .admin-img-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .admin-img-thumb{
   width:70px;height:55px;border-radius:8px;object-fit:cover;
@@ -5281,10 +5294,13 @@ async function saveAdminData(data){
       if(str.length < 500000) localStorage.setItem('wahat_places', str);
     } catch(qe) { /* تجاهل QuotaExceededError */ }
     const ok = await sbSet('wahat_places', data);
+    const saveEl = document.getElementById('sbSaveStatus');
     if(ok){
       showToast('✅ تم الحفظ — سيظهر لكل الزوار فوراً', 'success');
+      if(saveEl){ saveEl.textContent = '✅ آخر حفظ: '+new Date().toLocaleTimeString('ar-EG'); saveEl.style.color='#4ade80'; }
     } else {
       showToast('⚠️ حُفظ محلياً فقط — تحقق من اتصال Supabase', 'warning');
+      if(saveEl){ saveEl.textContent = '⚠️ فشل الحفظ في السحابة'; saveEl.style.color='#fbbf24'; }
     }
   } catch(e) {
     // لو الخطأ QuotaExceededError على iOS — جرب Supabase مباشرة
@@ -5472,19 +5488,55 @@ async function adminLoadDash(){
   }
 }
 
-function showSBStatus(){
-  const bar = document.getElementById('sbStatusBar');
-  if(!bar) return;
-  if(SB_READY){
-    bar.style.background='rgba(74,222,128,0.1)';
-    bar.style.borderColor='rgba(74,222,128,0.3)';
-    bar.innerHTML='🟢 <strong style="color:#4ade80">Supabase متصل</strong> — التعديلات تُحفظ في السحابة وتظهر على جميع الأجهزة';
-  } else {
-    bar.style.background='rgba(251,191,36,0.1)';
-    bar.style.borderColor='rgba(251,191,36,0.3)';
-    bar.innerHTML='🟡 <strong style="color:#fbbf24">Supabase غير مُضبوط</strong> — التعديلات محلية فقط. <a href="#" onclick="aTab(\'setup\');return false" style="color:#fbbf24;text-decoration:underline">اضبط Supabase الآن</a>';
+async function showSBStatus(forceCheck){
+  const bar  = document.getElementById('sbStatusBar');
+  const dot  = document.getElementById('sbDot');
+  const txt  = document.getElementById('sbStatusText');
+  if(!bar||!dot||!txt) return;
+  bar.style.display = 'block';
+
+  if(!SB_READY){
+    bar.style.background   = 'rgba(251,191,36,0.08)';
+    bar.style.borderColor  = 'rgba(251,191,36,0.3)';
+    dot.style.background   = '#fbbf24';
+    dot.style.boxShadow    = 'none';
+    txt.innerHTML = '<strong style="color:#fbbf24">Supabase غير مُضبوط</strong> — التعديلات محلية فقط. <a href="#" onclick="aTab(\'setup\');return false" style="color:#fbbf24">اضبطه الآن</a>';
+    return;
   }
-  bar.style.display='block';
+
+  // Pinging state
+  dot.style.background  = '#60a5fa';
+  dot.style.boxShadow   = '0 0 0 3px rgba(96,165,250,0.25)';
+  dot.style.animation   = 'sbPulse 1s infinite';
+  txt.innerHTML = '<span style="color:#60a5fa">جاري فحص الاتصال...</span>';
+
+  try{
+    const t0 = Date.now();
+    const r  = await Promise.race([
+      fetch(SB_URL+'/rest/v1/site_data?key=eq.wahat_probe&select=key',{
+        headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
+      }),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),5000))
+    ]);
+    const ms = Date.now()-t0;
+    if(r.ok){
+      bar.style.background  = 'rgba(74,222,128,0.08)';
+      bar.style.borderColor = 'rgba(74,222,128,0.3)';
+      dot.style.background  = '#4ade80';
+      dot.style.boxShadow   = '0 0 0 3px rgba(74,222,128,0.25)';
+      dot.style.animation   = 'sbPulse 2.5s infinite';
+      txt.innerHTML = '<strong style="color:#4ade80">Supabase متصل</strong> <span style="opacity:0.5;font-size:0.75rem">('+ms+'ms)</span> — التعديلات تُحفظ في السحابة وتظهر لكل الزوار';
+    } else {
+      throw new Error('HTTP '+r.status);
+    }
+  }catch(e){
+    bar.style.background  = 'rgba(239,68,68,0.08)';
+    bar.style.borderColor = 'rgba(239,68,68,0.3)';
+    dot.style.background  = '#f87171';
+    dot.style.boxShadow   = 'none';
+    dot.style.animation   = 'none';
+    txt.innerHTML = '<strong style="color:#f87171">تعذّر الاتصال بـ Supabase</strong> <span style="opacity:0.5;font-size:0.75rem">('+((e.message)||'error')+')</span> — التعديلات محلية فقط';
+  }
 }
 
 function renderAdminActionFields(key, place){

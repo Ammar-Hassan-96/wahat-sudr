@@ -4738,6 +4738,9 @@ function toggleFaq(btn){
 .admin-place-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .admin-place-title{font-weight:700;color:#fff;font-size:0.95rem}
 .admin-place-cat{font-size:0.7rem;background:rgba(10,126,140,0.2);color:#14B8CC;border-radius:20px;padding:3px 10px}
+.admin-place-cat-select{appearance:none;-webkit-appearance:none;font-size:0.72rem;background:rgba(10,126,140,0.18);color:#14B8CC;border:1px solid rgba(20,184,204,0.3);border-radius:20px;padding:3px 10px;cursor:pointer;outline:none;font-family:Cairo,sans-serif;transition:border-color .2s}
+.admin-place-cat-select:hover{border-color:rgba(20,184,204,0.7);background:rgba(10,126,140,0.28)}
+.admin-place-cat-select option{background:#0d1c2e;color:#fff}
 .admin-img-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .admin-img-thumb{
   width:70px;height:55px;border-radius:8px;object-fit:cover;
@@ -5545,7 +5548,14 @@ function renderAdminPlaces(){
           <span style="font-size:1.5rem">${_esc(place.emoji)}</span>
           <div>
             <div class="admin-place-title" contenteditable="true" onblur="adminUpdateField('${_esc(key)}','title',this.textContent)">${_esc(place.title)}</div>
-            <span class="admin-place-cat">${_esc(place.bg.replace('bg-',''))}</span>
+            <select class="admin-place-cat-select" onchange="adminUpdateBg('${_esc(key)}',this.value)" style="font-size:0.72rem;background:rgba(10,126,140,0.18);color:#14B8CC;border:1px solid rgba(20,184,204,0.3);border-radius:20px;padding:3px 10px;cursor:pointer;outline:none;font-family:Cairo,sans-serif">
+              <option value="bg-beach"    ${place.bg==='bg-beach'    ?'selected':''}>🏖️ شاطئ</option>
+              <option value="bg-therapy"  ${place.bg==='bg-therapy'  ?'selected':''}>💧 علاجي</option>
+              <option value="bg-religious"${place.bg==='bg-religious'?'selected':''}>🕌 ديني</option>
+              <option value="bg-adventure"${place.bg==='bg-adventure'?'selected':''}>🏄 مغامرة</option>
+              <option value="bg-food"     ${place.bg==='bg-food'     ?'selected':''}>🍽️ مطعم</option>
+              <option value="bg-hotel"    ${place.bg==='bg-hotel'    ?'selected':''}>🏨 فندق</option>
+            </select>
           </div>
         </div>
         <button class="btn-del-place" onclick="adminDeletePlace('${_esc(key)}')">🗑️ حذف</button>
@@ -5612,7 +5622,14 @@ function renderAdminHotels(){
           <span style="font-size:1.5rem">${_esc(place.emoji)}</span>
           <div>
             <div class="admin-place-title" contenteditable="true" onblur="adminUpdateField('${_esc(key)}','title',this.textContent)">${_esc(place.title)}</div>
-            <span class="admin-place-cat">bg-hotel → فندق</span>
+            <select class="admin-place-cat-select" onchange="adminUpdateBg('${_esc(key)}',this.value)" style="font-size:0.72rem;background:rgba(10,126,140,0.18);color:#14B8CC;border:1px solid rgba(20,184,204,0.3);border-radius:20px;padding:3px 10px;cursor:pointer;outline:none;font-family:Cairo,sans-serif">
+              <option value="bg-beach"    >🏖️ شاطئ</option>
+              <option value="bg-therapy"  >💧 علاجي</option>
+              <option value="bg-religious">🕌 ديني</option>
+              <option value="bg-adventure">🏄 مغامرة</option>
+              <option value="bg-food"     >🍽️ مطعم</option>
+              <option value="bg-hotel" selected>🏨 فندق</option>
+            </select>
           </div>
         </div>
         <button class="btn-del-place" onclick="adminDeleteHotel('${_esc(key)}')">🗑️ حذف</button>
@@ -5660,6 +5677,15 @@ async function adminUpdateField(key, field, val){
   const data = getAdminData();
   if(data[key]) data[key][field] = val.trim();
   await saveAdminData(data);
+}
+async function adminUpdateBg(key, newBg){
+  const data = getAdminData();
+  if(!data[key]) return;
+  data[key].bg = newBg;
+  await saveAdminData(data);
+  renderAdminPlaces();
+  renderAdminHotels();
+  showToast('✅ تم تغيير التصنيف','success');
 }
 async function adminUpdateInfo(key, idx, val){
   const data = getAdminData();

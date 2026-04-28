@@ -5168,7 +5168,7 @@ function getAdminCreds(){
         let h = await _sha256(old.pass);
         await sbSet('wahat_admin_creds_v2', {user: old.user, passHash: h});
         // Delete old plain text entry
-        try{ await fetch(`${SB_URL}/rest/v1/site_data?key=eq.wahat_admin_creds`,{method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}); }catch(e){}
+        try{ await sbSet('wahat_admin_creds', {migrated: true}); }catch(e){}
         console.log('%c✅ تم تشفير بيانات الأدمن في Supabase','color:#4ade80');
       }
     }catch(e){}
@@ -5343,7 +5343,7 @@ function applyDataToSite(placesData, infoData){
       _adminCredsCache = {user: old.user, passHash: h};
       // Save new format & delete old
       await sbSet('wahat_admin_creds_v2', _adminCredsCache);
-      try{ await fetch(`${SB_URL}/rest/v1/site_data?key=eq.wahat_admin_creds`,{method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}); }catch(e){}
+      try{ await sbSet('wahat_admin_creds', {migrated: true}); }catch(e){}
     }
   }catch(e){}
 })();
@@ -6468,7 +6468,7 @@ async function loadAdminBookings(){
           </button>
           <div style="display:none;flex-wrap:wrap;gap:5px;margin-top:5px;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px">
             ${(function(){
-              let ph=bk.phone.replace(/^0/,'20');
+              let ph=(bk.phone||'').replace(/^0/,'20');
               return [
                 {t:'📅 طلب موعد',    m:'أهلاً '+bk.name+'، متى يناسبك؟ 😊'},
                 {t:'⏳ قيد المراجعة',m:'أهلاً '+bk.name+'، طلبك رقم '+bk.id+' قيد المراجعة 🌊'},
@@ -6543,7 +6543,7 @@ function waCustomerDirect(bk, status){
     // رسالة مخصصة
     msg = `🌊 *واحة سدر السياحية*\n\nأهلاً ${bk.name}،\n\nبخصوص طلب الحجز رقم *${bk.id}* للـ ${bk.activity}...`;
   }
-  const phone = bk.phone.startsWith('0') ? '20'+bk.phone.slice(1) : bk.phone;
+  const phone = (bk.phone||'').startsWith('0') ? '20'+(bk.phone||'').slice(1) : (bk.phone||'');
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
@@ -9021,7 +9021,7 @@ async function loadSubs(){
       if(typeof v==='string'){ try{v=JSON.parse(v);}catch(e){} }
       if(v&&typeof v==='object') v._key=row.key;
       return v;
-    }).filter(function(v){ return v&&v.email; });
+    }).filter(function(v){ return v&&v.email&&!v._deleted; });
     renderSubs(_subs);
   }catch(e){
     console.warn('loadSubs error:',e);
@@ -9060,8 +9060,10 @@ async function delSub(idx){
   let s=_subs[idx];
   if(!s||!confirm('حذف: '+s.email+'؟')) return;
   if(s._key&&SB_READY){
-    try{await fetch(SB_URL+'/rest/v1/site_data?key=eq.'+encodeURIComponent(s._key),{method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});}
-    catch(e){}
+    // Soft-delete: overwrite with _deleted flag (DELETE is restricted by RLS)
+    try{ await sbSet(s._key, Object.assign({}, s, {_deleted: true})); }catch(e){}
+  } else if(s._key){
+    try{ localStorage.removeItem(s._key); }catch(e){}
   }
   _subs.splice(idx,1);
   renderSubs(_subs);
@@ -9071,8 +9073,12 @@ async function delSub(idx){
 async function clearSubs(){
   if(!confirm('مسح كل المشتركين نهائياً؟')) return;
   if(SB_READY){
-    try{await fetch(SB_URL+'/rest/v1/site_data?key=like.subscriber_'+encodeURIComponent('%'),{method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});}
-    catch(e){}
+    // Soft-delete each subscriber (DELETE is restricted by RLS)
+    try{
+      await Promise.all(_subs.filter(function(s){return s&&s._key;}).map(function(s){
+        return sbSet(s._key, Object.assign({}, s, {_deleted: true}));
+      }));
+    }catch(e){}
   }
   _subs=[];
   renderSubs([]);
@@ -9392,7 +9398,7 @@ function sendWaTemplate(bookingId, templateKey){
       .replace(/{activity}/g,bk.activity||'')
       .replace(/{checkin}/g,bk.checkin||'')
       .replace(/{phone}/g,bk.phone||'');
-    let phone=bk.phone.replace(/^0/,'20');
+    let phone=(bk.phone||'').replace(/^0/,'20');
     window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
   });
 }

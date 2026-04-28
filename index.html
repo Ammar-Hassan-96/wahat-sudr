@@ -6492,22 +6492,27 @@ async function loadAdminBookings(){
   }
 }
 
-async function bookingAction(idx, newStatus){
+async function bookingAction(bookingId, newStatus){
   if(!SB_READY){ alert('يتطلب ربط Supabase'); return; }
   try{
     let bookings = await sbGet('wahat_bookings');
-    if(!Array.isArray(bookings)){ alert('لا توجد بيانات'); return; }
+    if(!Array.isArray(bookings)){ showToast('لا توجد بيانات','error'); return; }
+    // Find booking by ID (not array index)
+    const idx = bookings.findIndex(function(b){ return b && b.id === bookingId; });
+    if(idx < 0){ showToast('الحجز غير موجود','error'); return; }
     const bk = bookings[idx];
-    if(!bk) return;
     bookings[idx].status = newStatus;
-    await sbSet('wahat_bookings', bookings);
+    const saved = await sbSet('wahat_bookings', bookings);
+    if(!saved){ showToast('فشل الحفظ — حاول مرة أخرى','error'); return; }
 
     // فتح واتساب للعميل برسالة تلقائية
     waCustomerDirect(bk, newStatus);
 
+    showToast(newStatus==='confirmed'?'✅ تم تأكيد الحجز':newStatus==='rejected'?'❌ تم رفض الحجز':'🏁 تم تحديث الحجز','success');
+
     // reload
     await loadAdminBookings();
-  }catch(e){ alert('خطأ أثناء التحديث'); }
+  }catch(e){ console.error('bookingAction error',e); showToast('خطأ أثناء التحديث','error'); }
 }
 
 function waCustomerDirect(bk, status){

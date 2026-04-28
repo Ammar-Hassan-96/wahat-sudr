@@ -7305,6 +7305,7 @@ window.addEventListener('load', function(){
 });
 
 function sendAdminNotif(title, body){
+  if(typeof Notification === 'undefined') return;
   if(Notification.permission!=='granted') return;
   if(!localStorage.getItem('ws_notif')) return;
   try{
